@@ -162,11 +162,11 @@
             android:tag="sticky"
             android:textStyle="bold" />
 
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="300dip"
-            android:background="@android:color/white"
-            />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/twitter_linearlayout"></LinearLayout>
 
         <TextView
             android:layout_width="match_parent"

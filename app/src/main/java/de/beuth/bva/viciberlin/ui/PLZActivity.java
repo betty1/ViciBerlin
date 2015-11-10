@@ -2,41 +2,43 @@ package de.beuth.bva.viciberlin.ui;
 
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import de.beuth.bva.viciberlin.R;
 import de.beuth.bva.viciberlin.model.ChartAttributes;
+import de.beuth.bva.viciberlin.rest.OAuthTwitterCall;
 import de.beuth.bva.viciberlin.util.CSVParser;
+import de.beuth.bva.viciberlin.rest.RestCall;
+import de.beuth.bva.viciberlin.util.HideShowListener;
+import de.beuth.bva.viciberlin.util.SortListByFrequency;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Column;
 import lecho.lib.hellocharts.model.ColumnChartData;
-import lecho.lib.hellocharts.model.Line;
-import lecho.lib.hellocharts.model.LineChartData;
-import lecho.lib.hellocharts.model.PointValue;
 import lecho.lib.hellocharts.model.SubcolumnValue;
 import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.ColumnChartView;
-import lecho.lib.hellocharts.view.LineChartView;
 
-public class PLZActivity extends AppCompatActivity {
+public class PLZActivity extends AppCompatActivity implements RestCall.RestCallback, OAuthTwitterCall.OAuthTwitterCallback {
 
     @Bind(R.id.age_header) TextView ageHeader;
     @Bind(R.id.age_chart) ColumnChartView ageChart;
@@ -47,6 +49,8 @@ public class PLZActivity extends AppCompatActivity {
     @Bind(R.id.duration_header) TextView durationHeader;
     @Bind(R.id.duration_chart) ColumnChartView durationChart;
 
+    @Bind(R.id.twitter_linearlayout) LinearLayout twitterTextView;
+
     final int PURPLE = R.color.graph_purple;
     final int GREEN = R.color.graph_green;
     final int BLUE = R.color.graph_blue;
@@ -54,8 +58,12 @@ public class PLZActivity extends AppCompatActivity {
 
     final String TAG = "PLZActivity";
 
-    String plz = "13353";
+    final String GOOGLE_REGION_CALLID = "googleRegionCall";
+    final String GOOGLE_LATLONG_CALLID = "googleLatLongCall";
+    final String TWITTER_CALLID = "twitterCall";
 
+    String plz = "";
+    String[] latLong = new String[2];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +74,7 @@ public class PLZActivity extends AppCompatActivity {
         updatePlz();
 
         // Set UI Listener
-        HideShowListener hideShowListener = new HideShowListener();
+        HideShowListener hideShowListener = new HideShowListener(this);
         ageHeader.setOnClickListener(hideShowListener);
         genderHeader.setOnClickListener(hideShowListener);
         locationHeader.setOnClickListener(hideShowListener);
@@ -105,9 +113,151 @@ public class PLZActivity extends AppCompatActivity {
         return true;
     }
 
+    private void apiCall(String url, String callId){
+        RestCall.startAPICall(url, callId, this);
+    }
+
+    private void twitterCall(){
+        if(latLong[0] != null && latLong[1] != null){
+            String url = "https://api.twitter.com/1.1/search/tweets.json?geocode="
+                            + latLong[0] + "," + latLong[1] + ",1km" + "&count=100";
+            OAuthTwitterCall.startAPICall(url, TWITTER_CALLID, this);
+        }
+    }
+
+    @Override
+    public void receiveResponse(String result, String callId) {
+
+        switch(callId){
+            case GOOGLE_REGION_CALLID:
+                fetchGoogleRegionName(result);
+                break;
+            case GOOGLE_LATLONG_CALLID:
+                fetchGoogleLatLong(result);
+                Log.d(TAG, "Received long lat response" + result);
+                break;
+            case TWITTER_CALLID:
+                fetchTwitterHashtags(result);
+                Log.d(TAG, "Twitter: " + result);
+                break;
+        }
+
+    }
+
+    private void fetchGoogleRegionName(String result) {
+        try {
+            JSONObject jsonResult = new JSONObject(result);
+            JSONArray resultArray = jsonResult.getJSONArray("results");
+
+            for(int i=0; i<resultArray.length(); i++){
+                JSONArray addressComponents = resultArray.getJSONObject(i).getJSONArray("address_components");
+
+                for(int j=0; j<addressComponents.length(); j++){
+                    JSONObject components = addressComponents.getJSONObject(j);
+                    JSONArray types = components.getJSONArray("types");
+
+                    if(types.getString(0).equals("sublocality_level_2")){
+                        String name = components.getString("short_name");
+                        getSupportActionBar().setTitle(plz + " " + name);
+                        return;
+                    }
+                }
+            }
+
+
+        } catch (Exception e){
+            Log.d(TAG, "Error parsing Google Region JSON");
+        }
+    }
+
+    private void fetchGoogleLatLong(String result) {
+        try {
+            JSONObject jsonResult = new JSONObject(result);
+            JSONArray resultArray = jsonResult.getJSONArray("results");
+            JSONObject geometry = resultArray.getJSONObject(0).getJSONObject("geometry");
+            Log.d(TAG, "Found geometry: " + geometry);
+            JSONObject location = geometry.getJSONObject("location");
+            String lat = location.getString("lat");
+            String lng = location.getString("lng");
+            latLong[0] = lat;
+            latLong[1] = lng;
+
+            apiCall("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng, GOOGLE_REGION_CALLID);
+            twitterCall();
+
+        } catch (Exception e){
+            Log.d(TAG, "Error parsing Google Lat Long JSON");
+        }
+    }
+
+    private void fetchTwitterHashtags(String result){
+
+        List<String> hashtagList = new ArrayList<>();
+        try {
+            JSONObject jsonResult = new JSONObject(result);
+            JSONArray statusesArray = jsonResult.getJSONArray("statuses");
+            Log.d(TAG, "statusesArray: " + statusesArray);
+
+            for(int i=0; i<statusesArray.length(); i++){
+                JSONObject status = statusesArray.getJSONObject(i);
+                JSONArray hashtags = status.getJSONObject("entities").getJSONArray("hashtags");
+                Log.d(TAG, "hashtagsarray: " + hashtags);
+
+                for(int j=0; j<hashtags.length(); j++){
+                    JSONObject hashtagObject = hashtags.getJSONObject(j);
+                    String hashtag = hashtagObject.getString("text");
+                    hashtagList.add(hashtag);
+
+                    Log.d(TAG, "Found hashtag: " + hashtag);
+                }
+            }
+        } catch (Exception e){
+            Log.d(TAG, "Error parsing Google Region JSON");
+        }
+
+        List<String> sortedHashtags = SortListByFrequency.sortByFreq(hashtagList);
+
+        for(int i=0; i<sortedHashtags.size(); i++){
+            if(i>5){
+                break;
+            }
+            TextView textView = new TextView(this);
+            textView.setText("#" + sortedHashtags.get(i));
+            textView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    TextView tv = (TextView) v;
+                    startTwitterIntent((String) tv.getText());
+                }
+            });
+            twitterTextView.addView(textView);
+        }
+
+    }
+
     private void updatePlz(){
         fillCharts();
         getSupportActionBar().setTitle(plz);
+        if(plz != ""){
+            apiCall("https://maps.googleapis.com/maps/api/geocode/json?address=" + plz + ",berlin", GOOGLE_LATLONG_CALLID);
+        }
+    }
+
+    private void startTwitterIntent(String hashtag){
+
+        // Create intent using ACTION_VIEW and a normal Twitter url:
+        String url = "https://twitter.com/search?q=%23" + hashtag.substring(1);
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+
+        // Narrow down to official Twitter app, if available:
+        List<ResolveInfo> matches = getPackageManager().queryIntentActivities(intent, 0);
+        for (ResolveInfo info : matches) {
+            if (info.activityInfo.packageName.toLowerCase().startsWith("com.twitter")) {
+                intent.setPackage(info.activityInfo.packageName);
+            }
+        }
+        startActivity(intent);
+
     }
 
     private void fillCharts(){
@@ -207,45 +357,5 @@ public class PLZActivity extends AppCompatActivity {
         chart.setColumnChartData(data);
     }
 
-    class HideShowListener implements View.OnClickListener {
 
-        HashMap<Integer, Integer[]> viewMap = new HashMap<>();
-
-        HideShowListener(){
-            super();
-            viewMap.put(R.id.age_header, new Integer[]{R.id.age_chart, R.id.age_arrow});
-            viewMap.put(R.id.gender_header, new Integer[]{R.id.gender_chart, R.id.gender_arrow});
-            viewMap.put(R.id.location_header, new Integer[]{R.id.location_chart, R.id.location_arrow});
-            viewMap.put(R.id.duration_header, new Integer[]{R.id.duration_chart, R.id.duration_arrow});
-
-        }
-
-        @Override
-        public void onClick(View v) {
-
-            View childView = findViewById(viewMap.get(v.getId())[0]);
-            ImageView arrowView = (ImageView) findViewById(viewMap.get(v.getId())[1]);
-
-            if(childView != null){
-
-                if(childView.getVisibility() == View.GONE){
-                    childView.setVisibility(View.VISIBLE);
-                } else {
-                    childView.setVisibility(View.GONE);
-                }
-
-            }
-            if(arrowView != null){
-
-                if(arrowView.getTag().equals("down")){
-                    arrowView.setTag("up");
-                    arrowView.setImageResource(R.drawable.android_arrow);
-                } else {
-                    arrowView.setTag("down");
-                    arrowView.setImageResource(R.drawable.android_arrowup);
-                }
-            }
-
-        }
-    }
 }
