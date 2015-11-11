@@ -29,19 +29,20 @@ import cz.msebera.android.httpclient.impl.client.HttpClientBuilder;
 public class OAuthTwitterCall {
 
     final static String TAG = "OAuthTwitterCall";
+
+    private final static String CONSUMER_KEY = "NLkaOeflUB0j8bogUDwmlt5e4";
+    private final static String CONSUMER_SECRET = "SSeiYYNhy4cmX4RyflA0dOruugnUDVu4sP1jureS1xMW100teT";
+    private final static String TwitterTokenURL = "https://api.twitter.com/oauth2/token";
+
     static OAuthTwitterCallback callback;
 
     public static void startAPICall(String url, String callId, OAuthTwitterCallback callback){
         OAuthTwitterCall.callback = callback;
 
-        new DownloadTwitterTask().execute(url, callId);
+        new AsyncTwitterCall().execute(url, callId);
     }
 
-    // Uses an AsyncTask to download a Twitter user's timeline
-    private static class DownloadTwitterTask extends AsyncTask<String, Void, String> {
-        final static String CONSUMER_KEY = "NLkaOeflUB0j8bogUDwmlt5e4";
-        final static String CONSUMER_SECRET = "SSeiYYNhy4cmX4RyflA0dOruugnUDVu4sP1jureS1xMW100teT";
-        final static String TwitterTokenURL = "https://api.twitter.com/oauth2/token";
+    private static class AsyncTwitterCall extends AsyncTask<String, Void, String> {
 
         String callId;
         String urlString;

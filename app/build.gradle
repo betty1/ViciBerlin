@@ -31,4 +31,6 @@ dependencies {
     compile 'com.google.code.gson:gson:2.4'
     compile 'org.glassfish:javax.annotation:10.0-b28'
     compile 'cz.msebera.android:httpclient:4.3.+'
+    compile 'org.scribe:scribe:1.3.5'
+
 }

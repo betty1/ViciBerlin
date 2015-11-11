@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
+import android.graphics.Color;
 import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +27,7 @@ import butterknife.ButterKnife;
 import de.beuth.bva.viciberlin.R;
 import de.beuth.bva.viciberlin.model.ChartAttributes;
 import de.beuth.bva.viciberlin.rest.OAuthTwitterCall;
+import de.beuth.bva.viciberlin.rest.OAuthYelpCall;
 import de.beuth.bva.viciberlin.util.CSVParser;
 import de.beuth.bva.viciberlin.rest.RestCall;
 import de.beuth.bva.viciberlin.util.HideShowListener;
@@ -38,7 +40,7 @@ import lecho.lib.hellocharts.model.SubcolumnValue;
 import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.ColumnChartView;
 
-public class PLZActivity extends AppCompatActivity implements RestCall.RestCallback, OAuthTwitterCall.OAuthTwitterCallback {
+public class PLZActivity extends AppCompatActivity implements RestCall.RestCallback, OAuthTwitterCall.OAuthTwitterCallback, OAuthYelpCall.OAuthYelpCallback {
 
     @Bind(R.id.age_header) TextView ageHeader;
     @Bind(R.id.age_chart) ColumnChartView ageChart;
@@ -49,7 +51,10 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
     @Bind(R.id.duration_header) TextView durationHeader;
     @Bind(R.id.duration_chart) ColumnChartView durationChart;
 
-    @Bind(R.id.twitter_linearlayout) LinearLayout twitterTextView;
+    @Bind(R.id.twitter_linearlayout) LinearLayout twitterLinearLayout;
+    @Bind(R.id.restaurants_textview) TextView restaurantTextView;
+    @Bind(R.id.cafes_textview) TextView cafesTextView;
+    @Bind(R.id.nightlife_textview) TextView nightlifeTextView;
 
     final int PURPLE = R.color.graph_purple;
     final int GREEN = R.color.graph_green;
@@ -61,8 +66,12 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
     final String GOOGLE_REGION_CALLID = "googleRegionCall";
     final String GOOGLE_LATLONG_CALLID = "googleLatLongCall";
     final String TWITTER_CALLID = "twitterCall";
+    final String YELP_RESTAURANT_CALLID = "yelpRestaurantCall";
+    final String YELP_NIGHTLIFE_CALLID = "yelpNightlifeCall";
+    final String YELP_CAFES_CALLID = "yelpCafesCall";
 
     String plz = "";
+    float area = 1;
     String[] latLong = new String[2];
 
     @Override
@@ -125,6 +134,12 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         }
     }
 
+    private void yelpCalls(){
+        OAuthYelpCall.startAPICall("restaurant", plz, YELP_RESTAURANT_CALLID, this);
+        OAuthYelpCall.startAPICall("nightlife", plz, YELP_NIGHTLIFE_CALLID, this);
+        OAuthYelpCall.startAPICall("cafes", plz, YELP_CAFES_CALLID, this);
+    }
+
     @Override
     public void receiveResponse(String result, String callId) {
 
@@ -139,6 +154,18 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
             case TWITTER_CALLID:
                 fetchTwitterHashtags(result);
                 Log.d(TAG, "Twitter: " + result);
+                break;
+            case YELP_RESTAURANT_CALLID:
+                Log.d(TAG, "Yelp: " + result);
+                fetchYelpTotals(result, restaurantTextView);
+                break;
+            case YELP_CAFES_CALLID:
+                Log.d(TAG, "Yelp: " + result);
+                fetchYelpTotals(result, cafesTextView);
+                break;
+            case YELP_NIGHTLIFE_CALLID:
+                Log.d(TAG, "Yelp: " + result);
+                fetchYelpTotals(result, nightlifeTextView);
                 break;
         }
 
@@ -163,7 +190,6 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
                     }
                 }
             }
-
 
         } catch (Exception e){
             Log.d(TAG, "Error parsing Google Region JSON");
@@ -190,18 +216,32 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         }
     }
 
+    private void fetchYelpTotals(String result, TextView textView) {
+        if(plz != null && !plz.equals("")){
+            try {
+                JSONObject jsonResult = new JSONObject(result);
+                int total = jsonResult.getInt("total");
+
+                int perkm2 = (int)(total / area);
+
+                textView.setText(perkm2 + " ");
+
+            } catch (Exception e){
+                Log.d(TAG, "Error parsing Yelp JSON");
+            }
+        }
+    }
+
     private void fetchTwitterHashtags(String result){
 
         List<String> hashtagList = new ArrayList<>();
         try {
             JSONObject jsonResult = new JSONObject(result);
             JSONArray statusesArray = jsonResult.getJSONArray("statuses");
-            Log.d(TAG, "statusesArray: " + statusesArray);
 
             for(int i=0; i<statusesArray.length(); i++){
                 JSONObject status = statusesArray.getJSONObject(i);
                 JSONArray hashtags = status.getJSONObject("entities").getJSONArray("hashtags");
-                Log.d(TAG, "hashtagsarray: " + hashtags);
 
                 for(int j=0; j<hashtags.length(); j++){
                     JSONObject hashtagObject = hashtags.getJSONObject(j);
@@ -217,12 +257,37 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
         List<String> sortedHashtags = SortListByFrequency.sortByFreq(hashtagList);
 
+
+
+        if(sortedHashtags.size() == 0){
+            twitterLinearLayout.addView(createTwitterTextView("keine", false));
+        }
+
         for(int i=0; i<sortedHashtags.size(); i++){
             if(i>5){
                 break;
             }
-            TextView textView = new TextView(this);
-            textView.setText("#" + sortedHashtags.get(i));
+            String text = "#" + sortedHashtags.get(i);
+            twitterLinearLayout.addView(createTwitterTextView(text, true));
+        }
+
+    }
+
+    private TextView createTwitterTextView(String text, boolean onclick){
+        TextView textView = new TextView(this);
+        int padding = (int) getResources().getDimension(R.dimen.subitem_padding);
+        int margin = (int) getResources().getDimension(R.dimen.subitem_margin);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(margin, margin, margin, margin);
+        textView.setLayoutParams(params);
+        textView.setTextSize(15);
+        textView.setTextColor(Color.WHITE);
+        textView.setBackgroundResource(R.color.colorPrimaryDark);
+        textView.setPadding(padding, padding, padding, padding);
+        textView.setText(text);
+
+        if(onclick){
             textView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -230,16 +295,17 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
                     startTwitterIntent((String) tv.getText());
                 }
             });
-            twitterTextView.addView(textView);
         }
 
+        return textView;
     }
 
     private void updatePlz(){
         fillCharts();
         getSupportActionBar().setTitle(plz);
-        if(plz != ""){
+        if(plz != null && !plz.equals("")) {
             apiCall("https://maps.googleapis.com/maps/api/geocode/json?address=" + plz + ",berlin", GOOGLE_LATLONG_CALLID);
+            yelpCalls();
         }
     }
 
@@ -280,6 +346,8 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         String[] durationLabels = new String[]{"unter 5 Jahre", "5-10 Jahre", "über 10 Jahre"};
         ChartAttributes durationAttrs = new ChartAttributes(durationValues, null, durationLabels, "", "Prozent");
         dataToChart(durationAttrs, durationChart, null);
+
+        area = CSVParser.getFloatValuesForPLZ(this, "area.csv", plz)[0];
     }
 
     private void dataToChart(ChartAttributes attrs, ColumnChartView chart, int[] colors) {
@@ -318,14 +386,12 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
             if(hasColors) {
                 columnColor = ContextCompat.getColor(this, colors[i]);
-                Log.d(TAG, "HAS COLORS - Color of column nr. " + i + ": " + columnColor);
             } else {
                 int newColor = ChartUtils.pickColor();
                 while(newColor == columnColor){
                     newColor = ChartUtils.pickColor();
                 }
                 columnColor = newColor;
-                Log.d(TAG, "NO COLORS - Color of column nr. " + i + ": " + columnColor);
             }
 
             tempValues = new ArrayList<SubcolumnValue>();

@@ -7,6 +7,8 @@
     <color name="header_bar">#6fcc6a</color>
     <color name="sub_bar">#A0CCDA</color>
 
+    <color name="yelp_tag">#a885ae</color>
+
     <color name="graph_green">#64dd17</color>
     <color name="graph_purple">#ab47bc</color>
     <color name="graph_blue">#29b6f6</color>

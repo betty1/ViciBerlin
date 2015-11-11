@@ -36,7 +36,6 @@ public class CSVParser {
                     // fetch values
                     for(int i=0; i<numValues; i++){
                         values[i] = Float.parseFloat(lineSplit[i+1]);
-                        Log.d(TAG, "parsedFloat: " + values[i]);
                     }
                     break;
 
