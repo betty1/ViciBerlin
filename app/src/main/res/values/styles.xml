@@ -1,11 +1,116 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+    <style name="GreenTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/bars_green</item>
+        <item name="colorPrimaryDark">@color/bars_darkgreen</item>
+        <item name="primaryBar">@style/PrimaryBar.Green</item>
+        <item name="primaryBarText">@style/PrimaryBarText.Green</item>
+        <item name="secondaryBar">@style/SecondaryBar.Green</item>
+        <item name="subBar">@style/SubBar.Green</item>
+    </style>
+
+    <style name="RoseTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/bars_darkcyan</item>
+        <item name="colorPrimaryDark">@color/bars_darkpurple</item>
+        <item name="primaryBar">@style/PrimaryBar.Rose</item>
+        <item name="primaryBarText">@style/PrimaryBarText.Rose</item>
+        <item name="secondaryBar">@style/SecondaryBar.Rose</item>
+        <item name="subBar">@style/SubBar.Rose</item>
+    </style>
+
+    <style name="BlueTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/bars_blue</item>
+        <item name="colorPrimaryDark">@color/bars_darkblue</item>
+        <item name="primaryBar">@style/PrimaryBar.Blue</item>
+        <item name="primaryBarText">@style/PrimaryBarText.Blue</item>
+        <item name="secondaryBar">@style/SecondaryBar.Blue</item>
+        <item name="subBar">@style/SubBar.Blue</item>
+    </style>
+
+    <style name="PrimaryBar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:padding">15dp</item>
+    </style>
+
+    <style name="PrimaryBar.Blue">
+        <item name="android:background">@color/bars_cyan</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="PrimaryBar.Green">
+        <item name="android:background">@color/bars_lightgreen</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="PrimaryBar.Rose">
+        <item name="android:background">@color/bars_rose</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="PrimaryBarText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="PrimaryBarText.Rose">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="PrimaryBarText.Green">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="PrimaryBarText.Blue">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
+
+
+
+
+
+    <style name="SecondaryBar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+    </style>
+
+    <style name="SecondaryBar.Blue">
+        <item name="android:background">@color/bars_blue_saturated</item>
+    </style>
+
+    <style name="SecondaryBar.Green">
+        <item name="android:background">@color/bars_lightblue</item>
+    </style>
+
+    <style name="SecondaryBar.Rose">
+        <item name="android:background">@color/bars_lightbrown</item>
+    </style>
+
+    <style name="SubBar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:padding">@dimen/subitem_padding</item>
+        <item name="android:layout_margin">2dp</item>
+    </style>
+
+    <style name="SubBar.Green">
+        <item name="android:background">@color/bars_blue_saturated</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="SubBar.Rose">
+        <item name="android:background">@color/bars_beige</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="SubBar.Blue">
+        <item name="android:background">@color/bars_blue_saturated</item>
+        <item name="android:textColor">@android:color/white</item>
     </style>
 
 </resources>

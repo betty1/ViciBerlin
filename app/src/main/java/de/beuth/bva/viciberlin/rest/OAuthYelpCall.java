@@ -33,6 +33,8 @@ public class OAuthYelpCall {
     private static final int SEARCH_LIMIT = 1;
     private static final String SEARCH_PATH = "/v2/search";
 
+    private static final String LOCATION_STRING = "berlin+de";
+
     private static final String CONSUMER_KEY = "DEnMAeUtRuTCVMX_BPGKjA";
     private static final String CONSUMER_SECRET = "BRLmIpG-zxnjMK10QqYVc8CXqR0";
     private static final String TOKEN = "94P6YIGTwQCi0yePMfTuo7s3VcO0jFLf";
@@ -94,8 +96,9 @@ public class OAuthYelpCall {
     public static String searchForBusinessesByLocation(String term, String plz) {
         OAuthRequest request = createOAuthRequest(SEARCH_PATH);
         request.addQuerystringParameter("term", term);
-        request.addQuerystringParameter("location", plz + ",berlin");
+        request.addQuerystringParameter("location", plz + "+" + LOCATION_STRING);
         request.addQuerystringParameter("limit", String.valueOf(SEARCH_LIMIT));
+        request.addQuerystringParameter("radius_filter", String.valueOf(700));
         return sendRequestAndGetResponse(request);
     }
 

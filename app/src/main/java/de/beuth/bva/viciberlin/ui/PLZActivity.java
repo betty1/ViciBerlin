@@ -4,21 +4,29 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import org.apmem.tools.layouts.FlowLayout;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +44,7 @@ import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Column;
 import lecho.lib.hellocharts.model.ColumnChartData;
+import lecho.lib.hellocharts.model.Line;
 import lecho.lib.hellocharts.model.SubcolumnValue;
 import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.ColumnChartView;
@@ -51,10 +60,13 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
     @Bind(R.id.duration_header) TextView durationHeader;
     @Bind(R.id.duration_chart) ColumnChartView durationChart;
 
-    @Bind(R.id.twitter_linearlayout) LinearLayout twitterLinearLayout;
+    @Bind(R.id.twitter_flowlayout) FlowLayout twitterFlowLayout;
     @Bind(R.id.restaurants_textview) TextView restaurantTextView;
     @Bind(R.id.cafes_textview) TextView cafesTextView;
     @Bind(R.id.nightlife_textview) TextView nightlifeTextView;
+
+    @Bind(R.id.twitter_progressbar) ProgressBar twitterProgressBar;
+    @Bind(R.id.yelp_progressbar) ProgressBar yelpProgressBar;
 
     final int PURPLE = R.color.graph_purple;
     final int GREEN = R.color.graph_green;
@@ -154,6 +166,7 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
             case TWITTER_CALLID:
                 fetchTwitterHashtags(result);
                 Log.d(TAG, "Twitter: " + result);
+                twitterProgressBar.setVisibility(View.INVISIBLE);
                 break;
             case YELP_RESTAURANT_CALLID:
                 Log.d(TAG, "Yelp: " + result);
@@ -166,6 +179,7 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
             case YELP_NIGHTLIFE_CALLID:
                 Log.d(TAG, "Yelp: " + result);
                 fetchYelpTotals(result, nightlifeTextView);
+                yelpProgressBar.setVisibility(View.INVISIBLE);
                 break;
         }
 
@@ -222,9 +236,9 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
                 JSONObject jsonResult = new JSONObject(result);
                 int total = jsonResult.getInt("total");
 
-                int perkm2 = (int)(total / area);
+//                int perkm2 = (int)(total / area);
 
-                textView.setText(perkm2 + " ");
+                textView.setText(total + " ");
 
             } catch (Exception e){
                 Log.d(TAG, "Error parsing Yelp JSON");
@@ -260,30 +274,37 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
 
         if(sortedHashtags.size() == 0){
-            twitterLinearLayout.addView(createTwitterTextView("keine", false));
+            twitterFlowLayout.addView(createTwitterView("keine", false));
         }
 
         for(int i=0; i<sortedHashtags.size(); i++){
-            if(i>5){
+            if(i>7){
                 break;
             }
             String text = "#" + sortedHashtags.get(i);
-            twitterLinearLayout.addView(createTwitterTextView(text, true));
+            twitterFlowLayout.addView(createTwitterView(text, true));
         }
-
     }
 
-    private TextView createTwitterTextView(String text, boolean onclick){
+    private LinearLayout createTwitterView(String text, boolean onclick){
+        LinearLayout linearLayout = new LinearLayout(this);
         TextView textView = new TextView(this);
+
         int padding = (int) getResources().getDimension(R.dimen.subitem_padding);
         int margin = (int) getResources().getDimension(R.dimen.subitem_margin);
 
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
         params.setMargins(margin, margin, margin, margin);
         textView.setLayoutParams(params);
+
         textView.setTextSize(15);
         textView.setTextColor(Color.WHITE);
-        textView.setBackgroundResource(R.color.colorPrimaryDark);
+
+        TypedValue typedValue = new TypedValue();
+        this.getTheme().resolveAttribute(R.attr.subBar, typedValue, true);
+        int color = typedValue.data;
+        textView.setBackgroundColor(color);
+
         textView.setPadding(padding, padding, padding, padding);
         textView.setText(text);
 
@@ -296,13 +317,21 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
                 }
             });
         }
-
-        return textView;
+        linearLayout.addView(textView);
+        return linearLayout;
     }
 
     private void updatePlz(){
+
+        // fetch Chart Data
         fillCharts();
+
+        // UI Reaction on new PLZ
         getSupportActionBar().setTitle(plz);
+        twitterProgressBar.setVisibility(View.VISIBLE);
+        yelpProgressBar.setVisibility(View.VISIBLE);
+
+        // Start Location Call and Yelp Call
         if(plz != null && !plz.equals("")) {
             apiCall("https://maps.googleapis.com/maps/api/geocode/json?address=" + plz + ",berlin", GOOGLE_LATLONG_CALLID);
             yelpCalls();

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <attr name="primaryBar" format="reference" />
+    <attr name="primaryBarText" format="reference" />
+    <attr name="secondaryBar" format="reference" />
+    <attr name="subBar" format="reference" />
+
+</resources>

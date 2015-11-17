@@ -9,23 +9,22 @@
         android:orientation="vertical"
         android:background="@android:color/white" >
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@color/header_bar"
-            android:text="Demographie"
+        <LinearLayout
+            android:orientation="horizontal"
+            style="?primaryBar"
             android:tag="sticky"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            android:padding="15dp" />
+            >
+
+            <TextView
+                style="?primaryBarText"
+                android:text="Demographie"
+            />
+        </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/sub_bar"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp">
+            style="?secondaryBar"
+            >
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -39,7 +38,7 @@
             <TextView
                 android:id="@+id/age_header"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:text="Alter"
                 android:padding="10dp" />
 
@@ -54,11 +53,8 @@
 
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/sub_bar"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp" >
+            style="?secondaryBar"
+            >
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -71,7 +67,7 @@
             <TextView
                 android:id="@+id/gender_header"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:text="Frauen/Männer"
                 android:padding="10dp"
                 />
@@ -87,11 +83,8 @@
 
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/sub_bar"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp" >
+            style="?secondaryBar"
+            >
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -104,7 +97,7 @@
             <TextView
                 android:id="@+id/location_header"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:text="Wohnlage"
                 android:padding="10dp"
                 />
@@ -120,11 +113,8 @@
 
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/sub_bar"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp" >
+            style="?secondaryBar"
+            >
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -137,7 +127,7 @@
             <TextView
                 android:id="@+id/duration_header"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:text="Wohndauer"
                 android:padding="10dp"
                 />
@@ -151,15 +141,26 @@
             android:layout_margin="20dp"
             android:visibility="gone" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:text="Yelp"
-            android:padding="15dp"
-            android:background="@color/header_bar"
-            android:textColor="@android:color/white"
+        <LinearLayout
+            android:orientation="horizontal"
+            style="?primaryBar"
             android:tag="sticky"
-            android:textStyle="bold" />
+            >
+
+            <TextView
+                style="?primaryBarText"
+                android:text="Yelp"
+                />
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/yelp_progressbar"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:visibility="invisible" />
+        </LinearLayout>
 
         <LinearLayout
             android:orientation="vertical"
@@ -168,25 +169,22 @@
 
             <LinearLayout
                 android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/sub_bar"
-                android:layout_margin="2dp"
-                android:padding="@dimen/subitem_padding"
-                >
+                style="?secondaryBar">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Restaurants: "
-                    />
+                    android:layout_gravity="center_vertical" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
                     android:textStyle="bold"
+                    android:textColor="@android:color/white"
                     android:id="@+id/restaurants_textview"
+                    android:layout_gravity="center_vertical"
                     />
 
                 <TextView
@@ -196,23 +194,21 @@
                     android:textColor="@android:color/white"
                     android:text=" pro km2"
                     android:id="@+id/restaurant_xtratextview"
+                    android:layout_gravity="center_vertical"
                     />
 
             </LinearLayout>
 
             <LinearLayout
                 android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/sub_bar"
-                android:layout_margin="2dp"
-                android:padding="@dimen/subitem_padding"
+                style="?secondaryBar"
                 >
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Cafés: "
+                    android:layout_gravity="center_vertical"
                     />
 
                 <TextView
@@ -220,7 +216,9 @@
                     android:layout_height="wrap_content"
                     android:text=""
                     android:textStyle="bold"
+                    android:textColor="@android:color/white"
                     android:id="@+id/cafes_textview"
+                    android:layout_gravity="center_vertical"
                     />
 
                 <TextView
@@ -230,23 +228,21 @@
                     android:text=" pro km2"
                     android:textColor="@android:color/white"
                     android:id="@+id/cafes_xtratextview"
+                    android:layout_gravity="center_vertical"
                     />
 
             </LinearLayout>
 
             <LinearLayout
                 android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/sub_bar"
-                android:layout_margin="2dp"
-                android:padding="@dimen/subitem_padding"
+                style="?secondaryBar"
                 >
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Nightlife: "
+                    android:layout_gravity="center_vertical"
                     />
 
                 <TextView
@@ -254,7 +250,9 @@
                     android:layout_height="wrap_content"
                     android:text=""
                     android:textStyle="bold"
+                    android:textColor="@android:color/white"
                     android:id="@+id/nightlife_textview"
+                    android:layout_gravity="center_vertical"
                     />
 
                 <TextView
@@ -264,27 +262,41 @@
                     android:text=" pro km2"
                     android:textColor="@android:color/white"
                     android:id="@+id/nightlife_xtratextview"
+                    android:layout_gravity="center_vertical"
                     />
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:text="Twitter"
-            android:padding="15dp"
-            android:background="@color/header_bar"
-            android:textColor="@android:color/white"
-            android:tag="sticky"
-            android:textStyle="bold" />
-
         <LinearLayout
-            android:orientation="vertical"
+            android:orientation="horizontal"
+            android:tag="sticky"
+            style="?primaryBar"
+            >
+
+            <TextView
+                style="?primaryBarText"
+                android:text="Twitter"
+                />
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/twitter_progressbar"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:visibility="invisible" />
+        </LinearLayout>
+
+        <org.apmem.tools.layouts.FlowLayout
+            android:id="@+id/twitter_flowlayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/twitter_linearlayout"></LinearLayout>
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+        </org.apmem.tools.layouts.FlowLayout>
+
 
     </LinearLayout>
 

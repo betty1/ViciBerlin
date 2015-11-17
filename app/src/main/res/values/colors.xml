@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#4d802b</color>
-    <color name="colorPrimaryDark">#3f6628</color>
-    <color name="colorAccent">#FF4081</color>
 
-    <color name="header_bar">#6fcc6a</color>
-    <color name="sub_bar">#A0CCDA</color>
+    <color name="bars_darkpurple">#1d0c12</color>
+    <color name="bars_darkcyan">#364f5f</color>
+    <color name="bars_rose">#e2939e</color>
+    <color name="bars_lightbrown">#b88b82</color>
+    <color name="bars_beige">#f2b1a6</color>
 
-    <color name="yelp_tag">#a885ae</color>
+    <color name="bars_green">#4d802b</color>
+    <color name="bars_darkgreen">#3f6628</color>
+    <color name="bars_lightgreen">#6fcc6a</color>
+    <color name="bars_lightblue">#A0CCDA</color>
+    <color name="bars_lightpurple">#a885ae</color>
+
+    <color name="bars_darkblue">#13293D</color>
+    <color name="bars_blue">#006494</color>
+    <color name="bars_cyan">#247BA0</color>
+    <color name="bars_blue_saturated">#1b98e0</color>
+    <color name="bars_darkblue_saturated">#3423A6</color>
+
 
     <color name="graph_green">#64dd17</color>
     <color name="graph_purple">#ab47bc</color>
