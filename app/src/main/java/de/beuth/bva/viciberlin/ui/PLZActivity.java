@@ -271,7 +271,7 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
         List<String> sortedHashtags = SortListByFrequency.sortByFreq(hashtagList);
 
-
+        twitterFlowLayout.removeAllViews();
 
         if(sortedHashtags.size() == 0){
             twitterFlowLayout.addView(createTwitterView("keine", false));

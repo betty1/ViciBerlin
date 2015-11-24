@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.emilsjolander.components.StickyScrollViewItems.StickyScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/sticky_scroll"
-    android:layout_height="match_parent" android:layout_width="match_parent">
+    android:layout_height="match_parent" android:layout_width="match_parent"
+    android:animateLayoutChanges="true" >
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@android:color/white" >
+        android:background="@android:color/white"
+        android:animateLayoutChanges="true"
+        >
 
         <LinearLayout
             android:orientation="horizontal"
@@ -49,7 +52,8 @@
             android:layout_width="fill_parent"
             android:layout_height="200dp"
             android:background="@android:color/white"
-            android:layout_margin="20dp" />
+            android:layout_margin="20dp"
+            />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -79,7 +83,8 @@
             android:layout_height="200dp"
             android:background="@android:color/white"
             android:layout_margin="20dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -109,7 +114,8 @@
             android:layout_height="200dp"
             android:background="@android:color/white"
             android:layout_margin="20dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -139,7 +145,8 @@
             android:layout_height="200dp"
             android:background="@android:color/white"
             android:layout_margin="20dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            />
 
         <LinearLayout
             android:orientation="horizontal"
