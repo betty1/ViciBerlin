@@ -16,6 +16,7 @@ public class CSVParser {
 
     public static float[] getFloatValuesForPLZ(Context context, String filename, String plz, int skip){
 
+        boolean plzFound = false;
         BufferedReader reader = null;
         float[] values = null;
         try {
@@ -32,6 +33,7 @@ public class CSVParser {
                 values = new float[numValues];
 
                 if(lineSplit[0].equals(plz)){
+                    plzFound = true;
 
                     // fetch values
                     for(int i=0; i<numValues; i++){
@@ -44,6 +46,7 @@ public class CSVParser {
         } catch (Exception e) {
 
             Log.d(TAG, "Exceptions while parsing csv: " + e.getMessage());
+            values = null;
 
         } finally {
             if (reader != null) {
@@ -55,7 +58,53 @@ public class CSVParser {
             }
         }
 
+        if(!plzFound){
+            values = null;
+        }
         return values;
+    }
+
+    public static String getStringForPLZ(Context context, String filename, String plz){
+
+        boolean plzFound = false;
+        BufferedReader reader = null;
+        String name = null;
+        try {
+            reader = new BufferedReader(
+                    new InputStreamReader(context.getAssets().open(filename), "UTF-8"));
+
+            // loop until end of file
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] lineSplit = line.split(";");
+
+                if(lineSplit[0].equals(plz)){
+                    plzFound = true;
+
+                    name = lineSplit[1];
+                    break;
+
+                }
+            }
+        } catch (Exception e) {
+
+            Log.d(TAG, "Exceptions while parsing csv: " + e.getMessage());
+            name = null;
+
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    Log.d(TAG, "Exceptions while closing BufferedReader: " + e.getMessage());
+                }
+            }
+        }
+
+        if(!plzFound){
+            name = null;
+        }
+        return name;
     }
 
     public static float[] getFloatValuesForPLZ(Context context, String filename, String plz) {

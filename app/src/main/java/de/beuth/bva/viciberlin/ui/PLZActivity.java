@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.location.Address;
-import android.location.Geocoder;
 import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -15,12 +13,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apmem.tools.layouts.FlowLayout;
 import org.json.JSONArray;
@@ -38,6 +37,7 @@ import de.beuth.bva.viciberlin.rest.OAuthTwitterCall;
 import de.beuth.bva.viciberlin.rest.OAuthYelpCall;
 import de.beuth.bva.viciberlin.util.CSVParser;
 import de.beuth.bva.viciberlin.rest.RestCall;
+import de.beuth.bva.viciberlin.util.Constants;
 import de.beuth.bva.viciberlin.util.HideShowListener;
 import de.beuth.bva.viciberlin.util.SortListByFrequency;
 import lecho.lib.hellocharts.model.Axis;
@@ -75,12 +75,13 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
     final String TAG = "PLZActivity";
 
-    final String GOOGLE_REGION_CALLID = "googleRegionCall";
     final String GOOGLE_LATLONG_CALLID = "googleLatLongCall";
     final String TWITTER_CALLID = "twitterCall";
     final String YELP_RESTAURANT_CALLID = "yelpRestaurantCall";
     final String YELP_NIGHTLIFE_CALLID = "yelpNightlifeCall";
     final String YELP_CAFES_CALLID = "yelpCafesCall";
+
+    Resources res;
 
     String plz = "";
     float area = 1;
@@ -90,8 +91,15 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_plz);
-        ButterKnife.bind(this);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        ButterKnife.bind(this);
+        res = getResources();
+
+        // Search
+        if (getIntent() != null) {
+            handleIntent(getIntent());
+        }
         updatePlz();
 
         // Set UI Listener
@@ -101,10 +109,6 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         locationHeader.setOnClickListener(hideShowListener);
         durationHeader.setOnClickListener(hideShowListener);
 
-        // Search
-        if (getIntent() != null) {
-            handleIntent(getIntent());
-        }
     }
 
     @Override
@@ -114,10 +118,13 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
 
     private void handleIntent(Intent intent) {
-
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             plz = query;
+            updatePlz();
+        }
+        if (Constants.PLZ_INTENT.equals(intent.getAction())) {
+            plz = intent.getStringExtra(Constants.PLZ_EXTRA);
             updatePlz();
         }
     }
@@ -134,31 +141,22 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         return true;
     }
 
-    private void apiCall(String url, String callId){
-        RestCall.startAPICall(url, callId, this);
-    }
-
-    private void twitterCall(){
-        if(latLong[0] != null && latLong[1] != null){
-            String url = "https://api.twitter.com/1.1/search/tweets.json?geocode="
-                            + latLong[0] + "," + latLong[1] + ",1km" + "&count=100";
-            OAuthTwitterCall.startAPICall(url, TWITTER_CALLID, this);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-    }
-
-    private void yelpCalls(){
-        OAuthYelpCall.startAPICall("restaurant", plz, YELP_RESTAURANT_CALLID, this);
-        OAuthYelpCall.startAPICall("nightlife", plz, YELP_NIGHTLIFE_CALLID, this);
-        OAuthYelpCall.startAPICall("cafes", plz, YELP_CAFES_CALLID, this);
     }
 
     @Override
     public void receiveResponse(String result, String callId) {
 
         switch(callId){
-            case GOOGLE_REGION_CALLID:
-                fetchGoogleRegionName(result);
-                break;
             case GOOGLE_LATLONG_CALLID:
                 fetchGoogleLatLong(result);
                 Log.d(TAG, "Received long lat response" + result);
@@ -185,29 +183,51 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
     }
 
-    private void fetchGoogleRegionName(String result) {
-        try {
-            JSONObject jsonResult = new JSONObject(result);
-            JSONArray resultArray = jsonResult.getJSONArray("results");
-
-            for(int i=0; i<resultArray.length(); i++){
-                JSONArray addressComponents = resultArray.getJSONObject(i).getJSONArray("address_components");
-
-                for(int j=0; j<addressComponents.length(); j++){
-                    JSONObject components = addressComponents.getJSONObject(j);
-                    JSONArray types = components.getJSONArray("types");
-
-                    if(types.getString(0).equals("sublocality_level_2")){
-                        String name = components.getString("short_name");
-                        getSupportActionBar().setTitle(plz + " " + name);
-                        return;
-                    }
-                }
-            }
-
-        } catch (Exception e){
-            Log.d(TAG, "Error parsing Google Region JSON");
+    private void updatePlz(){
+        // Get name of PLZ region
+        String name = fetchPLZName();
+        if(name == null){
+            Toast.makeText(this, res.getString(R.string.no_berlin_zipcode), Toast.LENGTH_LONG).show();
+            finish();
+            return;
         }
+
+        // UI Reaction on new PLZ
+        getSupportActionBar().setTitle(plz + " " + name);
+        twitterProgressBar.setVisibility(View.VISIBLE);
+        yelpProgressBar.setVisibility(View.VISIBLE);
+
+        // fetch Chart Data
+        fillCharts();
+
+        // Start Location Call and Yelp Call
+        if(plz != null && !plz.equals("")) {
+            apiCall("https://maps.googleapis.com/maps/api/geocode/json?address=" + plz + ",berlin", GOOGLE_LATLONG_CALLID);
+            yelpCalls();
+        }
+    }
+
+    private void apiCall(String url, String callId){
+        RestCall.startAPICall(url, callId, this);
+    }
+
+    private void twitterCall(){
+        if(latLong[0] != null && latLong[1] != null){
+            String url = "https://api.twitter.com/1.1/search/tweets.json?geocode="
+                            + latLong[0] + "," + latLong[1] + ",1km" + "&count=100";
+            OAuthTwitterCall.startAPICall(url, TWITTER_CALLID, this);
+        }
+    }
+
+    private void yelpCalls(){
+        OAuthYelpCall.startAPICall("restaurant", plz, YELP_RESTAURANT_CALLID, this);
+        OAuthYelpCall.startAPICall("nightlife", plz, YELP_NIGHTLIFE_CALLID, this);
+        OAuthYelpCall.startAPICall("cafes", plz, YELP_CAFES_CALLID, this);
+    }
+
+    private String fetchPLZName(){
+        String name = CSVParser.getStringForPLZ(this, "plz_names.csv", plz);
+        return name;
     }
 
     private void fetchGoogleLatLong(String result) {
@@ -222,7 +242,6 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
             latLong[0] = lat;
             latLong[1] = lng;
 
-            apiCall("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + lat + "," + lng, GOOGLE_REGION_CALLID);
             twitterCall();
 
         } catch (Exception e){
@@ -235,8 +254,6 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
             try {
                 JSONObject jsonResult = new JSONObject(result);
                 int total = jsonResult.getInt("total");
-
-//                int perkm2 = (int)(total / area);
 
                 textView.setText(total + " ");
 
@@ -274,7 +291,7 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         twitterFlowLayout.removeAllViews();
 
         if(sortedHashtags.size() == 0){
-            twitterFlowLayout.addView(createTwitterView("keine", false));
+            twitterFlowLayout.addView(createTwitterView(res.getString(R.string.none), false));
         }
 
         for(int i=0; i<sortedHashtags.size(); i++){
@@ -321,23 +338,6 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         return linearLayout;
     }
 
-    private void updatePlz(){
-
-        // fetch Chart Data
-        fillCharts();
-
-        // UI Reaction on new PLZ
-        getSupportActionBar().setTitle(plz);
-        twitterProgressBar.setVisibility(View.VISIBLE);
-        yelpProgressBar.setVisibility(View.VISIBLE);
-
-        // Start Location Call and Yelp Call
-        if(plz != null && !plz.equals("")) {
-            apiCall("https://maps.googleapis.com/maps/api/geocode/json?address=" + plz + ",berlin", GOOGLE_LATLONG_CALLID);
-            yelpCalls();
-        }
-    }
-
     private void startTwitterIntent(String hashtag){
 
         // Create intent using ACTION_VIEW and a normal Twitter url:
@@ -356,24 +356,25 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
     }
 
     private void fillCharts(){
+
         float[] ageValues = CSVParser.getFloatValuesForPLZ(this, "age.csv", plz);
-        String[] ageLabels = new String[]{"bis 12", "12-18", "18-35", "35-65", "ab 65"};
-        ChartAttributes ageAttrs = new ChartAttributes(ageValues, null, ageLabels, "Lebensjahre", "Prozent");
+        String[] ageLabels = new String[]{res.getString(R.string.to_12), "12-18", "18-35", "35-65", res.getString(R.string.from_65)};
+        ChartAttributes ageAttrs = new ChartAttributes(ageValues, null, ageLabels, res.getString(R.string.years), res.getString(R.string.percent));
         dataToChart(ageAttrs, ageChart, new int[]{GREEN, PURPLE, GREEN, PURPLE, GREEN});
 
         float[] genderValues = CSVParser.getFloatValuesForPLZ(this, "gender.csv", plz);
-        String[] genderLabels = new String[]{"Männer", "Frauen"};
-        ChartAttributes genderAttrs = new ChartAttributes(genderValues, null, genderLabels, "", "Prozent");
+        String[] genderLabels = new String[]{res.getString(R.string.male), res.getString(R.string.female)};
+        ChartAttributes genderAttrs = new ChartAttributes(genderValues, null, genderLabels, "", res.getString(R.string.percent));
         dataToChart(genderAttrs, genderChart, new int[]{DARKBLUE, BLUE});
 
         float[] locationValues = CSVParser.getFloatValuesForPLZ(this, "wohnlage.csv", plz, 1);
-        String[] locationLabels = new String[]{"Einfach", "Mittel", "Gut"};
-        ChartAttributes locationAttrs = new ChartAttributes(locationValues, null, locationLabels, "", "Prozent");
+        String[] locationLabels = new String[]{res.getString(R.string.simple), res.getString(R.string.mid), res.getString(R.string.good)};
+        ChartAttributes locationAttrs = new ChartAttributes(locationValues, null, locationLabels, "", res.getString(R.string.percent));
         dataToChart(locationAttrs, locationChart, null);
 
         float[] durationValues = CSVParser.getFloatValuesForPLZ(this, "wohndauer.csv", plz);
-        String[] durationLabels = new String[]{"unter 5 Jahre", "5-10 Jahre", "über 10 Jahre"};
-        ChartAttributes durationAttrs = new ChartAttributes(durationValues, null, durationLabels, "", "Prozent");
+        String[] durationLabels = new String[]{res.getString(R.string.less_than_5_years), res.getString(R.string.five_to_10_years), res.getString(R.string.more_than_10_years)};
+        ChartAttributes durationAttrs = new ChartAttributes(durationValues, null, durationLabels, "", res.getString(R.string.percent));
         dataToChart(durationAttrs, durationChart, null);
 
         area = CSVParser.getFloatValuesForPLZ(this, "area.csv", plz)[0];

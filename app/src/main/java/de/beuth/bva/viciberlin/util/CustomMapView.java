@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.Projection;
 
@@ -19,8 +20,19 @@ import org.osmdroid.views.Projection;
 public class CustomMapView extends MapView {
 
     private static final String TAG = "CustomMapView";
-    String longitude;
-    String latitude;
+    double longitude;
+    double latitude;
+
+    // The bounding box around all map points
+    // Used to determine the correct zoom level to show everything
+    private int minLat = Integer.MAX_VALUE;
+    private int minLon = Integer.MAX_VALUE;
+    private int maxLat = Integer.MIN_VALUE;
+    private int maxLon = Integer.MIN_VALUE;
+
+    private BoundingBoxE6 boundingBox;
+
+    LocationPressListener pressListener;
 
     public CustomMapView(final Context context, final AttributeSet attrs) {
         super(context, new DefaultResourceProxyImpl(context), null, null, attrs);
@@ -46,21 +58,30 @@ public class CustomMapView extends MapView {
             case MotionEvent.ACTION_DOWN:
                 Projection proj = this.getProjection();
                 IGeoPoint loc = proj.fromPixels((int) ev.getX(), (int) ev.getY());
-                longitude = Double.toString(((double)loc.getLongitudeE6())/1000000);
-                latitude = Double.toString(((double) loc.getLatitudeE6()) / 1000000);
+                latitude = (double) loc.getLatitudeE6()/1000000;
+                longitude = (double)loc.getLongitudeE6()/1000000;
         }
         gestureDetector.onTouchEvent(ev);
         return super.dispatchTouchEvent(ev);
     }
 
+    public void setPressListener(LocationPressListener listener){
+        this.pressListener = listener;
+    }
+
     final GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
         @Override
         public void onLongPress(MotionEvent e) {
-            Toast toast = Toast.makeText(getContext(), "Longitude: "+ longitude +" Latitude: "+ latitude , Toast.LENGTH_LONG);
-            toast.show();
+            if(pressListener != null){
+                pressListener.onLocationPress(latitude, longitude);
+            }
             Log.d(TAG, "Longitude: "+ longitude +" Latitude: "+ latitude);
         }
     });
+
+    public interface LocationPressListener {
+        void onLocationPress(double lat, double lng);
+    }
 
 }
 
