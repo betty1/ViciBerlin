@@ -38,18 +38,23 @@ import de.beuth.bva.viciberlin.rest.OAuthYelpCall;
 import de.beuth.bva.viciberlin.util.CSVParser;
 import de.beuth.bva.viciberlin.rest.RestCall;
 import de.beuth.bva.viciberlin.util.Constants;
+import de.beuth.bva.viciberlin.util.DataHandler;
 import de.beuth.bva.viciberlin.util.HideShowListener;
 import de.beuth.bva.viciberlin.util.SortListByFrequency;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Column;
 import lecho.lib.hellocharts.model.ColumnChartData;
+import lecho.lib.hellocharts.model.ComboLineColumnChartData;
 import lecho.lib.hellocharts.model.Line;
+import lecho.lib.hellocharts.model.LineChartData;
+import lecho.lib.hellocharts.model.PointValue;
 import lecho.lib.hellocharts.model.SubcolumnValue;
 import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.ColumnChartView;
+import lecho.lib.hellocharts.view.ComboLineColumnChartView;
 
-public class PLZActivity extends AppCompatActivity implements RestCall.RestCallback, OAuthTwitterCall.OAuthTwitterCallback, OAuthYelpCall.OAuthYelpCallback {
+public class PLZActivity extends AppCompatActivity implements RestCall.RestCallback, OAuthTwitterCall.OAuthTwitterCallback, OAuthYelpCall.OAuthYelpCallback, DataHandler.DataReceiver {
 
     @Bind(R.id.age_header) TextView ageHeader;
     @Bind(R.id.age_chart) ColumnChartView ageChart;
@@ -68,12 +73,13 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
     @Bind(R.id.twitter_progressbar) ProgressBar twitterProgressBar;
     @Bind(R.id.yelp_progressbar) ProgressBar yelpProgressBar;
 
+    final String TAG = "PLZActivity";
+
     final int PURPLE = R.color.graph_purple;
     final int GREEN = R.color.graph_green;
     final int BLUE = R.color.graph_blue;
     final int DARKBLUE = R.color.graph_darkblue;
-
-    final String TAG = "PLZActivity";
+    final int TRANSGRAY = R.color.graph_transgray;
 
     final String GOOGLE_LATLONG_CALLID = "googleLatLongCall";
     final String TWITTER_CALLID = "twitterCall";
@@ -82,9 +88,9 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
     final String YELP_CAFES_CALLID = "yelpCafesCall";
 
     Resources res;
+    DataHandler dataHandler;
 
     String plz = "";
-    float area = 1;
     String[] latLong = new String[2];
 
     @Override
@@ -95,6 +101,7 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
         ButterKnife.bind(this);
         res = getResources();
+        dataHandler = new DataHandler(this, this);
 
         // Search
         if (getIntent() != null) {
@@ -157,26 +164,36 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
     public void receiveResponse(String result, String callId) {
 
         switch(callId){
+            // 1. Get lat long values from result
+            // 2. Make Twitter call
             case GOOGLE_LATLONG_CALLID:
-                fetchGoogleLatLong(result);
+                latLong = dataHandler.fetchGoogleLatLong(result);
                 Log.d(TAG, "Received long lat response" + result);
+                twitterCall();
                 break;
+            // Create Twitter views from result
             case TWITTER_CALLID:
-                fetchTwitterHashtags(result);
+                createTwitterViews(result);
                 Log.d(TAG, "Twitter: " + result);
                 twitterProgressBar.setVisibility(View.INVISIBLE);
                 break;
+            // Set Yelp Restaurant Textview
             case YELP_RESTAURANT_CALLID:
                 Log.d(TAG, "Yelp: " + result);
-                fetchYelpTotals(result, restaurantTextView);
+                int restaurantCount = dataHandler.fetchYelpTotals(result);
+                restaurantTextView.setText(restaurantCount + " ");
                 break;
+            // Set Yelp Cafes Textview
             case YELP_CAFES_CALLID:
                 Log.d(TAG, "Yelp: " + result);
-                fetchYelpTotals(result, cafesTextView);
+                int cafeCount = dataHandler.fetchYelpTotals(result);
+                cafesTextView.setText(cafeCount + " ");
                 break;
+            // Set Yelp Nightlife Textview
             case YELP_NIGHTLIFE_CALLID:
                 Log.d(TAG, "Yelp: " + result);
-                fetchYelpTotals(result, nightlifeTextView);
+                int nightlifeCount = dataHandler.fetchYelpTotals(result);
+                nightlifeTextView.setText(nightlifeCount + " ");
                 yelpProgressBar.setVisibility(View.INVISIBLE);
                 break;
         }
@@ -184,8 +201,11 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
     }
 
     private void updatePlz(){
+
+        dataHandler.setPlz(plz);
+
         // Get name of PLZ region
-        String name = fetchPLZName();
+        String name = dataHandler.fetchPLZName();
         if(name == null){
             Toast.makeText(this, res.getString(R.string.no_berlin_zipcode), Toast.LENGTH_LONG).show();
             finish();
@@ -198,7 +218,7 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         yelpProgressBar.setVisibility(View.VISIBLE);
 
         // fetch Chart Data
-        fillCharts();
+        dataHandler.fillCharts();
 
         // Start Location Call and Yelp Call
         if(plz != null && !plz.equals("")) {
@@ -225,85 +245,25 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         OAuthYelpCall.startAPICall("cafes", plz, YELP_CAFES_CALLID, this);
     }
 
-    private String fetchPLZName(){
-        String name = CSVParser.getStringForPLZ(this, "plz_names.csv", plz);
-        return name;
-    }
+    private void createTwitterViews(String result){
 
-    private void fetchGoogleLatLong(String result) {
-        try {
-            JSONObject jsonResult = new JSONObject(result);
-            JSONArray resultArray = jsonResult.getJSONArray("results");
-            JSONObject geometry = resultArray.getJSONObject(0).getJSONObject("geometry");
-            Log.d(TAG, "Found geometry: " + geometry);
-            JSONObject location = geometry.getJSONObject("location");
-            String lat = location.getString("lat");
-            String lng = location.getString("lng");
-            latLong[0] = lat;
-            latLong[1] = lng;
-
-            twitterCall();
-
-        } catch (Exception e){
-            Log.d(TAG, "Error parsing Google Lat Long JSON");
-        }
-    }
-
-    private void fetchYelpTotals(String result, TextView textView) {
-        if(plz != null && !plz.equals("")){
-            try {
-                JSONObject jsonResult = new JSONObject(result);
-                int total = jsonResult.getInt("total");
-
-                textView.setText(total + " ");
-
-            } catch (Exception e){
-                Log.d(TAG, "Error parsing Yelp JSON");
-            }
-        }
-    }
-
-    private void fetchTwitterHashtags(String result){
-
-        List<String> hashtagList = new ArrayList<>();
-        try {
-            JSONObject jsonResult = new JSONObject(result);
-            JSONArray statusesArray = jsonResult.getJSONArray("statuses");
-
-            for(int i=0; i<statusesArray.length(); i++){
-                JSONObject status = statusesArray.getJSONObject(i);
-                JSONArray hashtags = status.getJSONObject("entities").getJSONArray("hashtags");
-
-                for(int j=0; j<hashtags.length(); j++){
-                    JSONObject hashtagObject = hashtags.getJSONObject(j);
-                    String hashtag = hashtagObject.getString("text");
-                    hashtagList.add(hashtag);
-
-                    Log.d(TAG, "Found hashtag: " + hashtag);
-                }
-            }
-        } catch (Exception e){
-            Log.d(TAG, "Error parsing Google Region JSON");
-        }
-
-        List<String> sortedHashtags = SortListByFrequency.sortByFreq(hashtagList);
-
+        List<String> twitterHashtags = dataHandler.fetchTwitterHashtags(result);
         twitterFlowLayout.removeAllViews();
 
-        if(sortedHashtags.size() == 0){
-            twitterFlowLayout.addView(createTwitterView(res.getString(R.string.none), false));
+        if(twitterHashtags.size() == 0){
+            twitterFlowLayout.addView(createSingleTwitterView(res.getString(R.string.none), false));
         }
 
-        for(int i=0; i<sortedHashtags.size(); i++){
+        for(int i=0; i<twitterHashtags.size(); i++){
             if(i>7){
                 break;
             }
-            String text = "#" + sortedHashtags.get(i);
-            twitterFlowLayout.addView(createTwitterView(text, true));
+            String text = "#" + twitterHashtags.get(i);
+            twitterFlowLayout.addView(createSingleTwitterView(text, true));
         }
     }
 
-    private LinearLayout createTwitterView(String text, boolean onclick){
+    private LinearLayout createSingleTwitterView(String text, boolean onclick){
         LinearLayout linearLayout = new LinearLayout(this);
         TextView textView = new TextView(this);
 
@@ -355,32 +315,7 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
     }
 
-    private void fillCharts(){
-
-        float[] ageValues = CSVParser.getFloatValuesForPLZ(this, "age.csv", plz);
-        String[] ageLabels = new String[]{res.getString(R.string.to_12), "12-18", "18-35", "35-65", res.getString(R.string.from_65)};
-        ChartAttributes ageAttrs = new ChartAttributes(ageValues, null, ageLabels, res.getString(R.string.years), res.getString(R.string.percent));
-        dataToChart(ageAttrs, ageChart, new int[]{GREEN, PURPLE, GREEN, PURPLE, GREEN});
-
-        float[] genderValues = CSVParser.getFloatValuesForPLZ(this, "gender.csv", plz);
-        String[] genderLabels = new String[]{res.getString(R.string.male), res.getString(R.string.female)};
-        ChartAttributes genderAttrs = new ChartAttributes(genderValues, null, genderLabels, "", res.getString(R.string.percent));
-        dataToChart(genderAttrs, genderChart, new int[]{DARKBLUE, BLUE});
-
-        float[] locationValues = CSVParser.getFloatValuesForPLZ(this, "wohnlage.csv", plz, 1);
-        String[] locationLabels = new String[]{res.getString(R.string.simple), res.getString(R.string.mid), res.getString(R.string.good)};
-        ChartAttributes locationAttrs = new ChartAttributes(locationValues, null, locationLabels, "", res.getString(R.string.percent));
-        dataToChart(locationAttrs, locationChart, null);
-
-        float[] durationValues = CSVParser.getFloatValuesForPLZ(this, "wohndauer.csv", plz);
-        String[] durationLabels = new String[]{res.getString(R.string.less_than_5_years), res.getString(R.string.five_to_10_years), res.getString(R.string.more_than_10_years)};
-        ChartAttributes durationAttrs = new ChartAttributes(durationValues, null, durationLabels, "", res.getString(R.string.percent));
-        dataToChart(durationAttrs, durationChart, null);
-
-        area = CSVParser.getFloatValuesForPLZ(this, "area.csv", plz)[0];
-    }
-
-    private void dataToChart(ChartAttributes attrs, ColumnChartView chart, int[] colors) {
+    public void dataToChart(ChartAttributes attrs, String chartType, int[] colors) {
 
         float[] values = attrs.values;
         float[] subValues = attrs.subValues;
@@ -428,7 +363,7 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
             tempValues.add(new SubcolumnValue(values[i], columnColor));
 
             if(hasSubColumn){
-                tempValues.add(new SubcolumnValue(subValues[i], columnColor));
+                tempValues.add(new SubcolumnValue(subValues[i], ContextCompat.getColor(this, DataHandler.DataReceiver.TRANSGRAY)));
             }
 
             Column column = new Column(tempValues);
@@ -450,7 +385,22 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         data.setAxisXBottom(axisX);
         data.setAxisYLeft(axisY);
 
-        chart.setColumnChartData(data);
+        switch (chartType){
+            case DataHandler.DataReceiver.AGE_CHART:
+                ageChart.setColumnChartData(data);
+                break;
+            case DataHandler.DataReceiver.GENDER_CHART:
+                genderChart.setColumnChartData(data);
+                break;
+             case DataHandler.DataReceiver.LOCATION_CHART:
+                locationChart.setColumnChartData(data);
+                break;
+             case DataHandler.DataReceiver.DURATION_CHART:
+                durationChart.setColumnChartData(data);
+                break;
+        }
+
+
     }
 
 

@@ -19,10 +19,10 @@
     <color name="bars_blue_saturated">#1b98e0</color>
     <color name="bars_darkblue_saturated">#3423A6</color>
 
-
     <color name="graph_green">#64dd17</color>
     <color name="graph_purple">#ab47bc</color>
     <color name="graph_blue">#29b6f6</color>
     <color name="graph_darkblue">#01579b</color>
+    <color name="graph_transgray">#55DDDDDD</color>
 
 </resources>

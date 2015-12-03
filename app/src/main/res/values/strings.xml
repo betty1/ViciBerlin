@@ -4,14 +4,14 @@
     <string name="search_title">PLZ</string>
 
     <!--Main-->
-    <string name="sub_title">Erfahre alles über Deine Nachbarschaft</string>
+    <string name="sub_title">Alles über Deine Nachbarschaft</string>
     <string name="press_long_or_choose_plz">Drücke lang auf einen Ort oder suche direkt nach einer Postleitzahl</string>
 
     <!--Labels-->
     <string name="percent">Prozent</string>
     <string name="years">Lebensjahre</string>
-    <string name="to_12">bis 12</string>
-    <string name="from_65">ab 12</string>
+    <string name="to_12">unter 12</string>
+    <string name="from_65">über 65</string>
     <string name="male">Männer</string>
     <string name="female">Frauen</string>
     <string name="simple">Einfach</string>
