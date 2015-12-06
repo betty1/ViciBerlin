@@ -69,10 +69,6 @@
     </style>
 
 
-
-
-
-
     <style name="SecondaryBar">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">40dp</item>
@@ -113,5 +109,14 @@
         <item name="android:background">@color/bars_blue_saturated</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
+
+    <style name="BlueTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="BlueTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="BlueTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>

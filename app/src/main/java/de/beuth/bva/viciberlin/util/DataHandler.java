@@ -2,9 +2,7 @@ package de.beuth.bva.viciberlin.util;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -14,13 +12,6 @@ import java.util.List;
 
 import de.beuth.bva.viciberlin.R;
 import de.beuth.bva.viciberlin.model.ChartAttributes;
-import lecho.lib.hellocharts.model.Axis;
-import lecho.lib.hellocharts.model.AxisValue;
-import lecho.lib.hellocharts.model.Column;
-import lecho.lib.hellocharts.model.ColumnChartData;
-import lecho.lib.hellocharts.model.SubcolumnValue;
-import lecho.lib.hellocharts.util.ChartUtils;
-import lecho.lib.hellocharts.view.ColumnChartView;
 
 /**
  * Created by betty on 03/12/15.

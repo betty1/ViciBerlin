@@ -75,12 +75,6 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
     final String TAG = "PLZActivity";
 
-    final int PURPLE = R.color.graph_purple;
-    final int GREEN = R.color.graph_green;
-    final int BLUE = R.color.graph_blue;
-    final int DARKBLUE = R.color.graph_darkblue;
-    final int TRANSGRAY = R.color.graph_transgray;
-
     final String GOOGLE_LATLONG_CALLID = "googleLatLongCall";
     final String TWITTER_CALLID = "twitterCall";
     final String YELP_RESTAURANT_CALLID = "yelpRestaurantCall";
@@ -116,6 +110,7 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         locationHeader.setOnClickListener(hideShowListener);
         durationHeader.setOnClickListener(hideShowListener);
 
+        Log.d(TAG, "Activity: " + this.getCallingActivity());
     }
 
     @Override

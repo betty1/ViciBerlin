@@ -6,6 +6,8 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by betty on 03/11/15.
@@ -105,6 +107,44 @@ public class CSVParser {
             name = null;
         }
         return name;
+    }
+
+    public static List<String> getPLZSuggestionForQuery(Context context, String query){
+
+        BufferedReader reader = null;
+        List<String> suggestions = new ArrayList<>();
+        try {
+            reader = new BufferedReader(
+                    new InputStreamReader(context.getAssets().open("plz_names.csv"), "UTF-8"));
+
+            // loop until end of file
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] lineSplit = line.split(";");
+                String plz = lineSplit[0];
+                String name = lineSplit[1];
+
+                if(plz.startsWith(query)){
+                    suggestions.add(plz + " " + name);
+                } else if(name.toLowerCase().startsWith(query.toLowerCase())){
+                    suggestions.add(plz + " " + name);
+                }
+            }
+        } catch (Exception e) {
+
+            Log.d(TAG, "Exceptions while parsing csv: " + e.getMessage());
+
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    Log.d(TAG, "Exceptions while closing BufferedReader: " + e.getMessage());
+                }
+            }
+        }
+
+        return suggestions;
     }
 
     public static float[] getFloatValuesForPLZ(Context context, String filename, String plz) {
