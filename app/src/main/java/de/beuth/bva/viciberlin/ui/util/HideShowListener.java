@@ -1,4 +1,4 @@
-package de.beuth.bva.viciberlin.util;
+package de.beuth.bva.viciberlin.ui.util;
 
 import android.app.Activity;
 import android.content.Context;
@@ -20,11 +20,13 @@ public class HideShowListener implements View.OnClickListener {
     public HideShowListener(Activity context){
         super();
         this.context = context;
-        viewMap.put(R.id.age_header, new Integer[]{R.id.age_chart, R.id.age_arrow});
-        viewMap.put(R.id.gender_header, new Integer[]{R.id.gender_chart, R.id.gender_arrow});
-        viewMap.put(R.id.location_header, new Integer[]{R.id.location_chart, R.id.location_arrow});
-        viewMap.put(R.id.duration_header, new Integer[]{R.id.duration_chart, R.id.duration_arrow});
-
+        viewMap.put(R.id.age_header, new Integer[]{R.id.age_linearlayout, R.id.age_arrow});
+        viewMap.put(R.id.age_equal_header, new Integer[]{R.id.age_equal_linearlayout, R.id.age_equal_arrow});
+        viewMap.put(R.id.gender_header, new Integer[]{R.id.gender_linearlayout, R.id.gender_arrow});
+        viewMap.put(R.id.location_header, new Integer[]{R.id.location_linearlayout, R.id.location_arrow});
+        viewMap.put(R.id.location_equal_header, new Integer[]{R.id.location_equal_linearlayout, R.id.location_equal_arrow});
+        viewMap.put(R.id.duration_header, new Integer[]{R.id.duration_linearlayout, R.id.duration_arrow});
+        viewMap.put(R.id.duration_equal_header, new Integer[]{R.id.duration_equal_linearlayout, R.id.duration_equal_arrow});
     }
 
     @Override

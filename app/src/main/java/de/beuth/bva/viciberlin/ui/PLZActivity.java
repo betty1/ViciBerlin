@@ -22,10 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apmem.tools.layouts.FlowLayout;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,35 +32,38 @@ import de.beuth.bva.viciberlin.R;
 import de.beuth.bva.viciberlin.model.ChartAttributes;
 import de.beuth.bva.viciberlin.rest.OAuthTwitterCall;
 import de.beuth.bva.viciberlin.rest.OAuthYelpCall;
-import de.beuth.bva.viciberlin.util.CSVParser;
 import de.beuth.bva.viciberlin.rest.RestCall;
 import de.beuth.bva.viciberlin.util.Constants;
 import de.beuth.bva.viciberlin.util.DataHandler;
-import de.beuth.bva.viciberlin.util.HideShowListener;
-import de.beuth.bva.viciberlin.util.SortListByFrequency;
+import de.beuth.bva.viciberlin.ui.util.HideShowListener;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Column;
 import lecho.lib.hellocharts.model.ColumnChartData;
-import lecho.lib.hellocharts.model.ComboLineColumnChartData;
 import lecho.lib.hellocharts.model.Line;
-import lecho.lib.hellocharts.model.LineChartData;
-import lecho.lib.hellocharts.model.PointValue;
 import lecho.lib.hellocharts.model.SubcolumnValue;
 import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.ColumnChartView;
-import lecho.lib.hellocharts.view.ComboLineColumnChartView;
 
 public class PLZActivity extends AppCompatActivity implements RestCall.RestCallback, OAuthTwitterCall.OAuthTwitterCallback, OAuthYelpCall.OAuthYelpCallback, DataHandler.DataReceiver {
 
-    @Bind(R.id.age_header) TextView ageHeader;
+    @Bind(R.id.age_header) LinearLayout ageHeader;
     @Bind(R.id.age_chart) ColumnChartView ageChart;
-    @Bind(R.id.gender_header) TextView genderHeader;
+    @Bind(R.id.age_equal_header) LinearLayout ageEqualHeader;
+    @Bind(R.id.age_equal_linearlayout) LinearLayout ageEqualLinearLayout;
+
+    @Bind(R.id.gender_header) LinearLayout genderHeader;
     @Bind(R.id.gender_chart) ColumnChartView genderChart;
-    @Bind(R.id.location_header) TextView locationHeader;
+
+    @Bind(R.id.location_header) LinearLayout locationHeader;
     @Bind(R.id.location_chart) ColumnChartView locationChart;
-    @Bind(R.id.duration_header) TextView durationHeader;
+    @Bind(R.id.location_equal_header) LinearLayout locationEqualHeader;
+    @Bind(R.id.location_equal_linearlayout) LinearLayout locationEqualLinearLayout;
+
+    @Bind(R.id.duration_header) LinearLayout durationHeader;
     @Bind(R.id.duration_chart) ColumnChartView durationChart;
+    @Bind(R.id.duration_equal_header) LinearLayout durationEqualHeader;
+    @Bind(R.id.duration_equal_linearlayout) LinearLayout durationEqualLinearLayout;
 
     @Bind(R.id.twitter_flowlayout) FlowLayout twitterFlowLayout;
     @Bind(R.id.restaurants_textview) TextView restaurantTextView;
@@ -101,14 +101,16 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         if (getIntent() != null) {
             handleIntent(getIntent());
         }
-        updatePlz();
 
         // Set UI Listener
         HideShowListener hideShowListener = new HideShowListener(this);
         ageHeader.setOnClickListener(hideShowListener);
+        ageEqualHeader.setOnClickListener(hideShowListener);
         genderHeader.setOnClickListener(hideShowListener);
         locationHeader.setOnClickListener(hideShowListener);
+        locationEqualHeader.setOnClickListener(hideShowListener);
         durationHeader.setOnClickListener(hideShowListener);
+        durationEqualHeader.setOnClickListener(hideShowListener);
 
         Log.d(TAG, "Activity: " + this.getCallingActivity());
     }
@@ -213,7 +215,7 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         yelpProgressBar.setVisibility(View.VISIBLE);
 
         // fetch Chart Data
-        dataHandler.fillCharts();
+        dataHandler.fillChartsAlternative();
 
         // Start Location Call and Yelp Call
         if(plz != null && !plz.equals("")) {
@@ -257,6 +259,7 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
             twitterFlowLayout.addView(createSingleTwitterView(text, true));
         }
     }
+
 
     private LinearLayout createSingleTwitterView(String text, boolean onclick){
         LinearLayout linearLayout = new LinearLayout(this);
@@ -310,6 +313,9 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
     }
 
+    // DataReceiver Interface
+
+    @Override
     public void dataToChart(ChartAttributes attrs, String chartType, int[] colors) {
 
         float[] values = attrs.values;
@@ -398,5 +404,52 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
     }
 
+    @Override
+    public void dataToViews(List<String> data, String chartType){
+
+        LinearLayout layout;
+
+        switch(chartType) {
+            case DataHandler.DataReceiver.AGE_CHART:
+                layout = ageEqualLinearLayout;
+                break;
+            case DataHandler.DataReceiver.LOCATION_CHART:
+                layout = locationEqualLinearLayout;
+                break;
+            case DataHandler.DataReceiver.DURATION_CHART:
+                layout = durationEqualLinearLayout;
+                break;
+            default:
+                return;
+        }
+
+        layout.removeAllViews();
+
+        for(int i=0; i<data.size(); i++){
+            TextView textView = new TextView(this);
+
+            int margin = (int) getResources().getDimension(R.dimen.subitem_margin);
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
+            params.setMargins(margin, margin, margin, margin);
+            textView.setLayoutParams(params);
+
+            textView.setTag(data.get(i));
+
+            textView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), PLZActivity.class);
+                    intent.setAction(Constants.PLZ_INTENT);
+                    intent.putExtra(Constants.PLZ_EXTRA, (String) v.getTag());
+                    startActivity(intent);
+                }
+            });
+
+            textView.setText(data.get(i) + " " + dataHandler.fetchPLZName(data.get(i)));
+            layout.addView(textView);
+        }
+
+    }
 
 }

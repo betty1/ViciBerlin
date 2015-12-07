@@ -1,4 +1,4 @@
-package de.beuth.bva.viciberlin.util;
+package de.beuth.bva.viciberlin.ui.util;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;

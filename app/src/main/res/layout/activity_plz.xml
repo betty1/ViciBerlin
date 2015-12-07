@@ -27,7 +27,7 @@
         <LinearLayout
             android:orientation="horizontal"
             style="?secondaryBar"
-            >
+            android:id="@+id/age_header">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -39,7 +39,6 @@
                 />
 
             <TextView
-                android:id="@+id/age_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Alter"
@@ -47,18 +46,61 @@
 
         </LinearLayout>
 
-        <lecho.lib.hellocharts.view.ColumnChartView
-            android:id="@+id/age_chart"
-            android:layout_width="fill_parent"
-            android:layout_height="200dp"
-            android:background="@android:color/white"
-            android:layout_margin="20dp"
-            />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/age_linearlayout"
+            android:animateLayoutChanges="true" >
+
+            <lecho.lib.hellocharts.view.ColumnChartView
+                android:id="@+id/age_chart"
+                android:layout_width="fill_parent"
+                android:layout_height="200dp"
+                android:background="@android:color/white"
+                android:layout_marginTop="20dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/age_equal_header"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="10dp"
+                    android:layout_height="5dp"
+                    android:id="@+id/age_equal_arrow"
+                    android:src="@drawable/android_arrow"
+                    android:layout_gravity="center_vertical"
+                    android:tag="up" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ähnliche Bezirke"
+                    android:padding="10dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/age_equal_linearlayout"
+                android:visibility="gone"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                ></LinearLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"
             style="?secondaryBar"
-            >
+            android:id="@+id/gender_header">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -69,7 +111,6 @@
                 android:tag="up" />
 
             <TextView
-                android:id="@+id/gender_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Frauen/Männer"
@@ -77,19 +118,26 @@
                 />
         </LinearLayout>
 
-        <lecho.lib.hellocharts.view.ColumnChartView
-            android:id="@+id/gender_chart"
-            android:layout_width="fill_parent"
-            android:layout_height="200dp"
-            android:background="@android:color/white"
-            android:layout_margin="20dp"
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/gender_linearlayout"
             android:visibility="gone"
-            />
+            android:animateLayoutChanges="true" >
+
+            <lecho.lib.hellocharts.view.ColumnChartView
+                android:id="@+id/gender_chart"
+                android:layout_width="fill_parent"
+                android:layout_height="200dp"
+                android:background="@android:color/white"
+                android:layout_margin="20dp" />
+        </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"
             style="?secondaryBar"
-            >
+            android:id="@+id/location_header">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -100,7 +148,6 @@
                 android:tag="up" />
 
             <TextView
-                android:id="@+id/location_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Wohnlage"
@@ -108,19 +155,62 @@
                 />
         </LinearLayout>
 
-        <lecho.lib.hellocharts.view.ColumnChartView
-            android:id="@+id/location_chart"
-            android:layout_width="fill_parent"
-            android:layout_height="200dp"
-            android:background="@android:color/white"
-            android:layout_margin="20dp"
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/location_linearlayout"
             android:visibility="gone"
-            />
+            android:animateLayoutChanges="true" >
+
+            <lecho.lib.hellocharts.view.ColumnChartView
+                android:id="@+id/location_chart"
+                android:layout_width="fill_parent"
+                android:layout_height="200dp"
+                android:background="@android:color/white"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="20dp" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/location_equal_header"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:gravity="center_vertical" >
+
+                <ImageView
+                    android:layout_width="10dp"
+                    android:layout_height="5dp"
+                    android:id="@+id/location_equal_arrow"
+                    android:src="@drawable/android_arrow"
+                    android:layout_gravity="center_vertical"
+                    android:tag="down" />
+
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ähnliche Bezirke"
+                    android:padding="10dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/location_equal_linearlayout"
+                android:visibility="gone"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp" />
+        </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"
             style="?secondaryBar"
-            >
+            android:id="@+id/duration_header">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -131,7 +221,6 @@
                 android:tag="up" />
 
             <TextView
-                android:id="@+id/duration_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Wohndauer"
@@ -139,14 +228,55 @@
                 />
         </LinearLayout>
 
-        <lecho.lib.hellocharts.view.ColumnChartView
-            android:id="@+id/duration_chart"
-            android:layout_width="fill_parent"
-            android:layout_height="200dp"
-            android:background="@android:color/white"
-            android:layout_margin="20dp"
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/duration_linearlayout"
             android:visibility="gone"
-            />
+            android:animateLayoutChanges="true" >
+
+            <lecho.lib.hellocharts.view.ColumnChartView
+                android:id="@+id/duration_chart"
+                android:layout_width="fill_parent"
+                android:layout_height="200dp"
+                android:background="@android:color/white"
+                android:layout_margin="20dp" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/duration_equal_header"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:gravity="center_vertical" >
+
+                <ImageView
+                    android:layout_width="10dp"
+                    android:layout_height="5dp"
+                    android:id="@+id/duration_equal_arrow"
+                    android:src="@drawable/android_arrow"
+                    android:layout_gravity="center_vertical"
+                    android:tag="down" />
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ähnliche Bezirke"
+                    android:padding="10dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/duration_equal_linearlayout"
+                android:visibility="gone"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp" />
+        </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"

@@ -11,7 +11,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,7 +24,6 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
 
 import java.util.List;
 
@@ -34,7 +32,7 @@ import butterknife.ButterKnife;
 import de.beuth.bva.viciberlin.R;
 import de.beuth.bva.viciberlin.util.CSVParser;
 import de.beuth.bva.viciberlin.util.Constants;
-import de.beuth.bva.viciberlin.util.CustomMapView;
+import de.beuth.bva.viciberlin.ui.util.CustomMapView;
 import de.beuth.bva.viciberlin.util.GeoProvider;
 
 public class MainActivity extends AppCompatActivity implements CustomMapView.LocationPressListener {
