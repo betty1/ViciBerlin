@@ -40,36 +40,6 @@ public class DataHandler {
 
     public void fillCharts(){
 
-        float[] ageValues = CSVParser.getFloatValuesForPLZ(context, "age.csv", plz);
-
-        float[] ageAverages = CSVParser.getFloatValuesForPLZ(context, "age.csv", "average");
-        String[] ageLabels = new String[]{res.getString(R.string.to_12), "12-17", "18-34", "35-65", res.getString(R.string.from_65)};
-        ChartAttributes ageAttrs = new ChartAttributes(ageValues, ageAverages, ageLabels, res.getString(R.string.years), res.getString(R.string.percent));
-        receiver.dataToChart(ageAttrs, DataReceiver.AGE_CHART, new int[]{DataReceiver.GREEN, DataReceiver.PURPLE, DataReceiver.GREEN, DataReceiver.PURPLE, DataReceiver.GREEN});
-
-        float[] genderValues = CSVParser.getFloatValuesForPLZ(context, "gender.csv", plz);
-        float[] genderAverages = CSVParser.getFloatValuesForPLZ(context, "gender.csv", "average");
-        String[] genderLabels = new String[]{res.getString(R.string.male), res.getString(R.string.female)};
-        ChartAttributes genderAttrs = new ChartAttributes(genderValues, genderAverages, genderLabels, "", res.getString(R.string.percent));
-        receiver.dataToChart(genderAttrs, DataReceiver.GENDER_CHART, new int[]{DataReceiver.DARKBLUE, DataReceiver.BLUE});
-
-        float[] locationValues = CSVParser.getFloatValuesForPLZ(context, "wohnlage.csv", plz, 1);
-        float[] locationAverages = CSVParser.getFloatValuesForPLZ(context, "wohnlage.csv", "average", 1);
-        String[] locationLabels = new String[]{res.getString(R.string.simple), res.getString(R.string.mid), res.getString(R.string.good)};
-        ChartAttributes locationAttrs = new ChartAttributes(locationValues, locationAverages, locationLabels, "", res.getString(R.string.percent));
-        receiver.dataToChart(locationAttrs, DataReceiver.LOCATION_CHART, null);
-
-        float[] durationValues = CSVParser.getFloatValuesForPLZ(context, "wohndauer.csv", plz);
-        float[] durationAverages = CSVParser.getFloatValuesForPLZ(context, "wohndauer.csv", "average");
-        String[] durationLabels = new String[]{res.getString(R.string.less_than_5_years), res.getString(R.string.five_to_10_years), res.getString(R.string.more_than_10_years)};
-        ChartAttributes durationAttrs = new ChartAttributes(durationValues, durationAverages, durationLabels, "", res.getString(R.string.percent));
-        receiver.dataToChart(durationAttrs, DataReceiver.DURATION_CHART, null);
-
-//        area = CSVParser.getFloatValuesForPLZ(context, "area.csv", plz)[0];
-    }
-
-    public void fillChartsAlternative(){
-
         PLZResult age = CSVParser.fetchPLZResult(context, "age.csv", plz);
         float[] ageValues = age.getValues();
         List<String> ageMostEquals = age.getMostEquals();
@@ -77,8 +47,8 @@ public class DataHandler {
         float[] ageAverages = CSVParser.getFloatValuesForPLZ(context, "age.csv", "average");
         String[] ageLabels = new String[]{res.getString(R.string.to_12), "12-17", "18-34", "35-65", res.getString(R.string.from_65)};
         ChartAttributes ageAttrs = new ChartAttributes(ageValues, ageAverages, ageLabels, res.getString(R.string.years), res.getString(R.string.percent));
-        receiver.dataToChart(ageAttrs, DataReceiver.AGE_CHART, new int[]{DataReceiver.GREEN, DataReceiver.PURPLE, DataReceiver.GREEN, DataReceiver.PURPLE, DataReceiver.GREEN});
-        receiver.dataToViews(ageMostEquals, DataReceiver.AGE_CHART);
+        receiver.dataToChart(ageAttrs, Constants.AGE_CHART, new int[]{DataReceiver.GREEN, DataReceiver.PURPLE, DataReceiver.GREEN, DataReceiver.PURPLE, DataReceiver.GREEN});
+        receiver.dataToViews(ageMostEquals, Constants.AGE_CHART);
 
         PLZResult gender = CSVParser.fetchPLZResult(context, "gender.csv", plz);
         float[] genderValues = gender.getValues();
@@ -87,7 +57,7 @@ public class DataHandler {
         float[] genderAverages = CSVParser.getFloatValuesForPLZ(context, "gender.csv", "average");
         String[] genderLabels = new String[]{res.getString(R.string.male), res.getString(R.string.female)};
         ChartAttributes genderAttrs = new ChartAttributes(genderValues, genderAverages, genderLabels, "", res.getString(R.string.percent));
-        receiver.dataToChart(genderAttrs, DataReceiver.GENDER_CHART, new int[]{DataReceiver.DARKBLUE, DataReceiver.BLUE});
+        receiver.dataToChart(genderAttrs, Constants.GENDER_CHART, new int[]{DataReceiver.DARKBLUE, DataReceiver.BLUE});
 
         PLZResult location = CSVParser.fetchPLZResult(context, "wohnlage.csv", plz, 1);
         float[] locationValues = location.getValues();
@@ -96,8 +66,8 @@ public class DataHandler {
         float[] locationAverages = CSVParser.getFloatValuesForPLZ(context, "wohnlage.csv", "average", 1);
         String[] locationLabels = new String[]{res.getString(R.string.simple), res.getString(R.string.mid), res.getString(R.string.good)};
         ChartAttributes locationAttrs = new ChartAttributes(locationValues, locationAverages, locationLabels, "", res.getString(R.string.percent));
-        receiver.dataToChart(locationAttrs, DataReceiver.LOCATION_CHART, null);
-        receiver.dataToViews(locationMostEquals, DataReceiver.LOCATION_CHART);
+        receiver.dataToChart(locationAttrs, Constants.LOCATION_CHART, null);
+        receiver.dataToViews(locationMostEquals, Constants.LOCATION_CHART);
 
         PLZResult duration = CSVParser.fetchPLZResult(context, "wohndauer.csv", plz);
         float[] durationValues = duration.getValues();
@@ -106,8 +76,8 @@ public class DataHandler {
         float[] durationAverages = CSVParser.getFloatValuesForPLZ(context, "wohndauer.csv", "average");
         String[] durationLabels = new String[]{res.getString(R.string.less_than_5_years), res.getString(R.string.five_to_10_years), res.getString(R.string.more_than_10_years)};
         ChartAttributes durationAttrs = new ChartAttributes(durationValues, durationAverages, durationLabels, "", res.getString(R.string.percent));
-        receiver.dataToChart(durationAttrs, DataReceiver.DURATION_CHART, null);
-        receiver.dataToViews(durationMostEquals, DataReceiver.DURATION_CHART);
+        receiver.dataToChart(durationAttrs, Constants.DURATION_CHART, null);
+        receiver.dataToViews(durationMostEquals, Constants.DURATION_CHART);
 
 //        area = CSVParser.getFloatValuesForPLZ(context, "area.csv", plz)[0];
     }
@@ -191,10 +161,6 @@ public class DataHandler {
         int DARKBLUE = R.color.graph_darkblue;
         int TRANSGRAY = R.color.graph_transgray;
 
-        String AGE_CHART = "ageChart";
-        String GENDER_CHART = "genderChart";
-        String LOCATION_CHART = "locationChart";
-        String DURATION_CHART = "durationChart";
         void dataToChart(ChartAttributes attrs, String chartType, int[] colors);
         void dataToViews(List<String> data, String chartType);
     }

@@ -82,21 +82,27 @@ public class CSVParser {
             // loop until end of file
             String line;
             while ((line = reader.readLine()) != null) {
+
+                // lineSplit[0] = plz of line, lineSplit[1+...] = values
                 String[] lineSplit = line.split(";");
 
-                int numValues = lineSplit.length-skip-1;
+                int numValues = lineSplit.length-1-skip;
 
-                if(lineSplit[0].equals(plz)) {
+                // skip average value
+                if(lineSplit[0].equals(Constants.AVERAGE)){
+                    continue;
+                } else if(lineSplit[0].equals(plz)) {
                     // fetch values for selected plz
                     values = new float[numValues];
-                    for(int i=0; i<numValues; i++){
-                        values[i] = Float.parseFloat(lineSplit[i+1]);
+
+                    for(int i = 0; i < numValues; i++){
+                        values[i] = Float.parseFloat(lineSplit[1+i]);
                     }
                 } else {
                     // save values for comparison
                     float[] tempValues = new float[numValues];
                     for(int i=0; i<numValues; i++){
-                        tempValues[i] = Float.parseFloat(lineSplit[i+1]);
+                        tempValues[i] = Float.parseFloat(lineSplit[1+i]);
                     }
                     otherValues.put(lineSplit[0], tempValues);
                 }

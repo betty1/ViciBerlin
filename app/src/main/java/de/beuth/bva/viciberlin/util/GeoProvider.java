@@ -13,8 +13,11 @@ import java.util.Locale;
  */
 public class GeoProvider {
 
+    final public static String NO_SERVER_RESPONSE = "noServerResponse";
+    final public static String NO_ZIP_AVAILABLE = "noZipAvailable";
+
     public static String plzFromLatLng(Context context, double lat, double lng){
-        String plz = null;
+        String plz = NO_ZIP_AVAILABLE;
         try {
             Geocoder geocoder = new Geocoder(context, Locale.getDefault());
             List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
@@ -23,6 +26,7 @@ public class GeoProvider {
         }
         catch (IOException e) {
             e.printStackTrace();
+            return NO_SERVER_RESPONSE;
         }
         return plz;
     }

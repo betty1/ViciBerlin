@@ -7,6 +7,19 @@
     <string name="sub_title">Alles über Deine Nachbarschaft</string>
     <string name="press_long_or_choose_plz">Drücke lang auf einen Ort oder suche direkt nach einer Postleitzahl</string>
 
+    <!--Titles-->
+    <string name="demography">Demographie</string>
+    <string name="age">Alter</string>
+    <string name="gender">Frauen/Männer</string>
+    <string name="location">Wohnlage</string>
+    <string name="duration">Wohndauer</string>
+    <string name="restaurants">Restaurants:&#160;</string>
+    <string name="cafes">Cafés:&#160;</string>
+    <string name="nightlife">Nightlife:&#160;</string>
+    <string name="equal_regions">Ähnliche Bezirke</string>
+    <string name="yelp">Yelp</string>
+    <string name="twitter">Twitter</string>
+
     <!--Labels-->
     <string name="percent">Prozent</string>
     <string name="years">Lebensjahre</string>
@@ -20,9 +33,12 @@
     <string name="less_than_5_years">unter 5 Jahre</string>
     <string name="five_to_10_years">5-10 Jahre</string>
     <string name="more_than_10_years">über 10 Jahre</string>
+    <string name="per_km2">&#160;pro km2</string>
 
     <!--Hints-->
     <string name="no_berlin_zipcode">Bitte wählen Sie eine Berliner PLZ</string>
+    <string name="no_available_zipcode">Bitte wählen Sie einen anderen Ort in der Nähe</string>
+    <string name="no_internet">Schwache Internetverbindung, bitte geben Sie die PLZ in das Suchfeld ein</string>
     <string name="none">keine</string>
     <string name="title_activity_draw">DrawActivity</string>
 
@@ -31,5 +47,8 @@
 
     <string name="action_settings">Settings</string>
 
+    <!--Tags-->
+    <string name="plz_tag">plzTag</string>
+    <string name="charttype_tag">chartTypeTag</string>
 
 </resources>

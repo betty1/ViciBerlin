@@ -3,6 +3,7 @@ package de.beuth.bva.viciberlin.ui;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.MatrixCursor;
 import android.provider.BaseColumns;
 import android.support.v4.view.GravityCompat;
@@ -33,6 +34,7 @@ import de.beuth.bva.viciberlin.R;
 import de.beuth.bva.viciberlin.util.CSVParser;
 import de.beuth.bva.viciberlin.util.Constants;
 import de.beuth.bva.viciberlin.ui.util.CustomMapView;
+import de.beuth.bva.viciberlin.util.DataHandler;
 import de.beuth.bva.viciberlin.util.GeoProvider;
 
 public class MainActivity extends AppCompatActivity implements CustomMapView.LocationPressListener {
@@ -40,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements CustomMapView.Loc
     private static final String TAG = "MainActivity";
     @Bind(R.id.map) CustomMapView mapView;
     @Bind(R.id.drawer_layout) DrawerLayout drawerLayout;
-    @Bind(R.id.left_drawer) LinearLayout drawerLinearLayout;
     @Bind(R.id.nav_login_icon) ImageButton loginIcon;
     @Bind(R.id.nav_info_icon) ImageButton infoIcon;
 
@@ -48,12 +49,14 @@ public class MainActivity extends AppCompatActivity implements CustomMapView.Loc
     private SimpleCursorAdapter searchAdapter;
     private SearchView searchView;
     List<String> suggestions;
+    Resources res;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        res = getResources();
 
         setupMap();
         setupNavigationDrawer();
@@ -68,7 +71,6 @@ public class MainActivity extends AppCompatActivity implements CustomMapView.Loc
         searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setSuggestionsAdapter(searchAdapter);
-        searchView.isIconified();
         searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
             @Override
             public boolean onSuggestionClick(int position) {
@@ -114,11 +116,13 @@ public class MainActivity extends AppCompatActivity implements CustomMapView.Loc
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
-        } else if(!searchView.isIconified()) {
-            searchView.setIconified(true);
-        } else {
-            super.onBackPressed();
+            return;
         }
+        if(!searchView.isIconified()) {
+            searchView.setIconified(true);
+            return;
+        }
+        super.onBackPressed();
     }
 
     private void setupNavigationDrawer(){
@@ -178,8 +182,11 @@ public class MainActivity extends AppCompatActivity implements CustomMapView.Loc
     public void onLocationPress(double lat, double lng) {
         String plz = GeoProvider.plzFromLatLng(this, lat, lng);
 
-        if(plz==null){
-            Toast.makeText(this, "Bitte wähle einen anderen Ort in der Nähe.", Toast.LENGTH_SHORT).show();
+        if(plz == GeoProvider.NO_SERVER_RESPONSE){
+            Toast.makeText(this, res.getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
+            return;
+        } else if(plz == GeoProvider.NO_ZIP_AVAILABLE){
+            Toast.makeText(this, res.getString(R.string.no_available_zipcode), Toast.LENGTH_SHORT).show();
             return;
         }
         Intent intent = new Intent(getApplicationContext(), PLZActivity.class);

@@ -20,7 +20,7 @@
 
             <TextView
                 style="?primaryBarText"
-                android:text="Demographie"
+                android:text="@string/demography"
             />
         </LinearLayout>
 
@@ -33,15 +33,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/age_arrow"
-                android:src="@drawable/android_arrowup"
+                android:src="@drawable/android_arrow"
                 android:layout_gravity="center_vertical"
-                android:tag="down"
+                android:tag="up"
                 />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Alter"
+                android:text="@string/age"
                 android:padding="10dp" />
 
         </LinearLayout>
@@ -51,7 +51,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/age_linearlayout"
-            android:animateLayoutChanges="true" >
+            android:animateLayoutChanges="true"
+            android:visibility="gone">
 
             <lecho.lib.hellocharts.view.ColumnChartView
                 android:id="@+id/age_chart"
@@ -82,7 +83,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Ähnliche Bezirke"
+                    android:text="@string/equal_regions"
                     android:padding="10dp" />
             </LinearLayout>
 
@@ -113,7 +114,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Frauen/Männer"
+                android:text="@string/gender"
                 android:padding="10dp"
                 />
         </LinearLayout>
@@ -150,7 +151,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Wohnlage"
+                android:text="@string/location"
                 android:padding="10dp"
                 />
         </LinearLayout>
@@ -187,13 +188,13 @@
                     android:id="@+id/location_equal_arrow"
                     android:src="@drawable/android_arrow"
                     android:layout_gravity="center_vertical"
-                    android:tag="down" />
+                    android:tag="up" />
 
                 <TextView
                     android:id="@+id/textView2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Ähnliche Bezirke"
+                    android:text="@string/equal_regions"
                     android:padding="10dp" />
             </LinearLayout>
 
@@ -223,7 +224,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Wohndauer"
+                android:text="@string/duration"
                 android:padding="10dp"
                 />
         </LinearLayout>
@@ -258,13 +259,13 @@
                     android:id="@+id/duration_equal_arrow"
                     android:src="@drawable/android_arrow"
                     android:layout_gravity="center_vertical"
-                    android:tag="down" />
+                    android:tag="up" />
 
                 <TextView
                     android:id="@+id/textView3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Ähnliche Bezirke"
+                    android:text="@string/equal_regions"
                     android:padding="10dp" />
             </LinearLayout>
 
@@ -286,7 +287,7 @@
 
             <TextView
                 style="?primaryBarText"
-                android:text="Yelp"
+                android:text="@string/yelp"
                 />
 
             <ProgressBar
@@ -311,7 +312,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Restaurants: "
+                    android:text="@string/restaurants"
                     android:layout_gravity="center_vertical" />
 
                 <TextView
@@ -329,7 +330,7 @@
                     android:layout_height="wrap_content"
                     android:textSize="8dp"
                     android:textColor="@android:color/white"
-                    android:text=" pro km2"
+                    android:text="@string/per_km2"
                     android:id="@+id/restaurant_xtratextview"
                     android:layout_gravity="center_vertical"
                     />
@@ -344,7 +345,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Cafés: "
+                    android:text="@string/cafes"
                     android:layout_gravity="center_vertical"
                     />
 
@@ -362,7 +363,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="8dp"
-                    android:text=" pro km2"
+                    android:text="@string/per_km2"
                     android:textColor="@android:color/white"
                     android:id="@+id/cafes_xtratextview"
                     android:layout_gravity="center_vertical"
@@ -378,7 +379,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Nightlife: "
+                    android:text="@string/nightlife"
                     android:layout_gravity="center_vertical"
                     />
 
@@ -396,7 +397,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="8dp"
-                    android:text=" pro km2"
+                    android:text="@string/per_km2"
                     android:textColor="@android:color/white"
                     android:id="@+id/nightlife_xtratextview"
                     android:layout_gravity="center_vertical"
@@ -414,7 +415,7 @@
 
             <TextView
                 style="?primaryBarText"
-                android:text="Twitter"
+                android:text="@string/twitter"
                 />
 
             <ProgressBar

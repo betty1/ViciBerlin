@@ -49,19 +49,23 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
     @Bind(R.id.age_header) LinearLayout ageHeader;
     @Bind(R.id.age_chart) ColumnChartView ageChart;
+    @Bind(R.id.age_linearlayout) LinearLayout ageLinearLayout;
     @Bind(R.id.age_equal_header) LinearLayout ageEqualHeader;
     @Bind(R.id.age_equal_linearlayout) LinearLayout ageEqualLinearLayout;
 
     @Bind(R.id.gender_header) LinearLayout genderHeader;
     @Bind(R.id.gender_chart) ColumnChartView genderChart;
+    @Bind(R.id.gender_linearlayout) LinearLayout genderLinearLayout;
 
     @Bind(R.id.location_header) LinearLayout locationHeader;
     @Bind(R.id.location_chart) ColumnChartView locationChart;
+    @Bind(R.id.location_linearlayout) LinearLayout locationLinearLayout;
     @Bind(R.id.location_equal_header) LinearLayout locationEqualHeader;
     @Bind(R.id.location_equal_linearlayout) LinearLayout locationEqualLinearLayout;
 
     @Bind(R.id.duration_header) LinearLayout durationHeader;
     @Bind(R.id.duration_chart) ColumnChartView durationChart;
+    @Bind(R.id.duration_linearlayout) LinearLayout durationLinearLayout;
     @Bind(R.id.duration_equal_header) LinearLayout durationEqualHeader;
     @Bind(R.id.duration_equal_linearlayout) LinearLayout durationEqualLinearLayout;
 
@@ -83,6 +87,7 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
     Resources res;
     DataHandler dataHandler;
+    HideShowListener hideShowListener;
 
     String plz = "";
     String[] latLong = new String[2];
@@ -97,13 +102,8 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         res = getResources();
         dataHandler = new DataHandler(this, this);
 
-        // Search
-        if (getIntent() != null) {
-            handleIntent(getIntent());
-        }
-
         // Set UI Listener
-        HideShowListener hideShowListener = new HideShowListener(this);
+        hideShowListener = new HideShowListener(this);
         ageHeader.setOnClickListener(hideShowListener);
         ageEqualHeader.setOnClickListener(hideShowListener);
         genderHeader.setOnClickListener(hideShowListener);
@@ -111,6 +111,11 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         locationEqualHeader.setOnClickListener(hideShowListener);
         durationHeader.setOnClickListener(hideShowListener);
         durationEqualHeader.setOnClickListener(hideShowListener);
+
+        // Search
+        if (getIntent() != null) {
+            handleIntent(getIntent());
+        }
 
         Log.d(TAG, "Activity: " + this.getCallingActivity());
     }
@@ -125,10 +130,17 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             plz = query;
+            preOpenViews(Constants.AGE_CHART);
             updatePlz();
         }
         if (Constants.PLZ_INTENT.equals(intent.getAction())) {
             plz = intent.getStringExtra(Constants.PLZ_EXTRA);
+            String preopen = intent.getStringExtra(Constants.PREOPEN_EXTRA);
+            if(preopen != null){
+                preOpenViews(preopen);
+            } else {
+                preOpenViews(Constants.AGE_CHART);
+            }
             updatePlz();
         }
     }
@@ -197,6 +209,28 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
     }
 
+    private void preOpenViews(String chartType){
+        LinearLayout layout;
+
+        switch(chartType) {
+            case Constants.AGE_CHART:
+                layout = ageHeader;
+                break;
+            case Constants.GENDER_CHART:
+                layout = genderHeader;
+                break;
+            case Constants.LOCATION_CHART:
+                layout = locationHeader;
+                break;
+            case Constants.DURATION_CHART:
+                layout = durationHeader;
+                break;
+            default:
+                return;
+        }
+        hideShowListener.onClick(layout);
+    }
+
     private void updatePlz(){
 
         dataHandler.setPlz(plz);
@@ -215,7 +249,7 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         yelpProgressBar.setVisibility(View.VISIBLE);
 
         // fetch Chart Data
-        dataHandler.fillChartsAlternative();
+        dataHandler.fillCharts();
 
         // Start Location Call and Yelp Call
         if(plz != null && !plz.equals("")) {
@@ -259,7 +293,6 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
             twitterFlowLayout.addView(createSingleTwitterView(text, true));
         }
     }
-
 
     private LinearLayout createSingleTwitterView(String text, boolean onclick){
         LinearLayout linearLayout = new LinearLayout(this);
@@ -387,16 +420,16 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         data.setAxisYLeft(axisY);
 
         switch (chartType){
-            case DataHandler.DataReceiver.AGE_CHART:
+            case Constants.AGE_CHART:
                 ageChart.setColumnChartData(data);
                 break;
-            case DataHandler.DataReceiver.GENDER_CHART:
+            case Constants.GENDER_CHART:
                 genderChart.setColumnChartData(data);
                 break;
-             case DataHandler.DataReceiver.LOCATION_CHART:
+             case Constants.LOCATION_CHART:
                 locationChart.setColumnChartData(data);
                 break;
-             case DataHandler.DataReceiver.DURATION_CHART:
+             case Constants.DURATION_CHART:
                 durationChart.setColumnChartData(data);
                 break;
         }
@@ -410,13 +443,13 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         LinearLayout layout;
 
         switch(chartType) {
-            case DataHandler.DataReceiver.AGE_CHART:
+            case Constants.AGE_CHART:
                 layout = ageEqualLinearLayout;
                 break;
-            case DataHandler.DataReceiver.LOCATION_CHART:
+            case Constants.LOCATION_CHART:
                 layout = locationEqualLinearLayout;
                 break;
-            case DataHandler.DataReceiver.DURATION_CHART:
+            case Constants.DURATION_CHART:
                 layout = durationEqualLinearLayout;
                 break;
             default:
@@ -434,14 +467,17 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
             params.setMargins(margin, margin, margin, margin);
             textView.setLayoutParams(params);
 
-            textView.setTag(data.get(i));
+            // Set plz and chartType as tags to access them in OnClickListener
+            textView.setTag(R.string.plz_tag, data.get(i));
+            textView.setTag(R.string.charttype_tag, chartType);
 
             textView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(getApplicationContext(), PLZActivity.class);
                     intent.setAction(Constants.PLZ_INTENT);
-                    intent.putExtra(Constants.PLZ_EXTRA, (String) v.getTag());
+                    intent.putExtra(Constants.PLZ_EXTRA, (String) v.getTag(R.string.plz_tag));
+                    intent.putExtra(Constants.PREOPEN_EXTRA, (String) v.getTag(R.string.charttype_tag));
                     startActivity(intent);
                 }
             });
