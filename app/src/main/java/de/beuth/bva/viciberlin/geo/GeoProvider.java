@@ -1,4 +1,4 @@
-package de.beuth.bva.viciberlin.util;
+package de.beuth.bva.viciberlin.geo;
 
 import android.content.Context;
 import android.location.Address;
@@ -27,6 +27,9 @@ public class GeoProvider {
         catch (IOException e) {
             e.printStackTrace();
             return NO_SERVER_RESPONSE;
+        }
+        catch (Exception e) {
+            return NO_ZIP_AVAILABLE;
         }
         return plz;
     }

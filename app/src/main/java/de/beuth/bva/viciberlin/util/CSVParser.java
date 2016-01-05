@@ -89,7 +89,7 @@ public class CSVParser {
                 int numValues = lineSplit.length-1-skip;
 
                 // skip average value
-                if(lineSplit[0].equals(Constants.AVERAGE)){
+                if(lineSplit[0].equals(Constants.AVERAGE) || lineSplit[0].equals(Constants.PLZ)){
                     continue;
                 } else if(lineSplit[0].equals(plz)) {
                     // fetch values for selected plz

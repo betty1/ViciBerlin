@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="de.beuth.bva.viciberlin.ui.LoginActivity"
+    android:background="@android:color/white">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        style="?primaryBar"
+        android:padding="5dp">
+
+        <de.beuth.bva.viciberlin.ui.util.AspectRatioButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@mipmap/ic_launcher"
+            android:layout_marginRight="10dp" />
+
+        <TextView
+            style="?primaryBarText"
+            android:text="@string/logged_in_as"
+            android:id="@+id/logged_in_as_textview" />
+
+    </LinearLayout>
+
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:text="@string/logout"
+        android:id="@+id/logout_button"
+        android:background="#61aef3"
+        android:textColor="@android:color/white"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="20dp" />
+
+</LinearLayout>

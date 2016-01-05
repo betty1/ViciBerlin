@@ -5,19 +5,28 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
+import android.database.MatrixCursor;
 import android.graphics.Color;
 import android.net.Uri;
+import android.provider.BaseColumns;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,9 +42,12 @@ import de.beuth.bva.viciberlin.model.ChartAttributes;
 import de.beuth.bva.viciberlin.rest.OAuthTwitterCall;
 import de.beuth.bva.viciberlin.rest.OAuthYelpCall;
 import de.beuth.bva.viciberlin.rest.RestCall;
+import de.beuth.bva.viciberlin.util.CSVParser;
 import de.beuth.bva.viciberlin.util.Constants;
 import de.beuth.bva.viciberlin.util.DataHandler;
 import de.beuth.bva.viciberlin.ui.util.HideShowListener;
+import de.beuth.bva.viciberlin.util.UserLoginControl;
+import io.techery.properratingbar.ProperRatingBar;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Column;
@@ -49,25 +61,26 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
     @Bind(R.id.age_header) LinearLayout ageHeader;
     @Bind(R.id.age_chart) ColumnChartView ageChart;
-    @Bind(R.id.age_linearlayout) LinearLayout ageLinearLayout;
     @Bind(R.id.age_equal_header) LinearLayout ageEqualHeader;
     @Bind(R.id.age_equal_linearlayout) LinearLayout ageEqualLinearLayout;
 
     @Bind(R.id.gender_header) LinearLayout genderHeader;
     @Bind(R.id.gender_chart) ColumnChartView genderChart;
-    @Bind(R.id.gender_linearlayout) LinearLayout genderLinearLayout;
 
     @Bind(R.id.location_header) LinearLayout locationHeader;
     @Bind(R.id.location_chart) ColumnChartView locationChart;
-    @Bind(R.id.location_linearlayout) LinearLayout locationLinearLayout;
     @Bind(R.id.location_equal_header) LinearLayout locationEqualHeader;
     @Bind(R.id.location_equal_linearlayout) LinearLayout locationEqualLinearLayout;
 
     @Bind(R.id.duration_header) LinearLayout durationHeader;
     @Bind(R.id.duration_chart) ColumnChartView durationChart;
-    @Bind(R.id.duration_linearlayout) LinearLayout durationLinearLayout;
     @Bind(R.id.duration_equal_header) LinearLayout durationEqualHeader;
     @Bind(R.id.duration_equal_linearlayout) LinearLayout durationEqualLinearLayout;
+
+    @Bind(R.id.foreigners_header) LinearLayout foreignersHeader;
+    @Bind(R.id.foreigners_chart) ColumnChartView foreignersChart;
+    @Bind(R.id.foreigners_equal_header) LinearLayout foreignersEqualHeader;
+    @Bind(R.id.foreigners_equal_linearlayout) LinearLayout foreignersEqualLinearLayout;
 
     @Bind(R.id.twitter_flowlayout) FlowLayout twitterFlowLayout;
     @Bind(R.id.restaurants_textview) TextView restaurantTextView;
@@ -76,6 +89,11 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
     @Bind(R.id.twitter_progressbar) ProgressBar twitterProgressBar;
     @Bind(R.id.yelp_progressbar) ProgressBar yelpProgressBar;
+
+    @Bind(R.id.rate_plz_header) LinearLayout ratePlzHeader;
+
+    PopupWindow ratingPopup;
+    View popUpLayout;
 
     final String TAG = "PLZActivity";
 
@@ -88,6 +106,10 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
     Resources res;
     DataHandler dataHandler;
     HideShowListener hideShowListener;
+
+    private SimpleCursorAdapter searchAdapter;
+    private SearchView searchView;
+    List<String> suggestions;
 
     String plz = "";
     String[] latLong = new String[2];
@@ -102,22 +124,14 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         res = getResources();
         dataHandler = new DataHandler(this, this);
 
-        // Set UI Listener
-        hideShowListener = new HideShowListener(this);
-        ageHeader.setOnClickListener(hideShowListener);
-        ageEqualHeader.setOnClickListener(hideShowListener);
-        genderHeader.setOnClickListener(hideShowListener);
-        locationHeader.setOnClickListener(hideShowListener);
-        locationEqualHeader.setOnClickListener(hideShowListener);
-        durationHeader.setOnClickListener(hideShowListener);
-        durationEqualHeader.setOnClickListener(hideShowListener);
+        setupUIListener();
 
-        // Search
+        // Search Intent
         if (getIntent() != null) {
             handleIntent(getIntent());
         }
 
-        Log.d(TAG, "Activity: " + this.getCallingActivity());
+        setupRatingPopup();
     }
 
     @Override
@@ -125,34 +139,19 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         handleIntent(intent);
     }
 
-
-    private void handleIntent(Intent intent) {
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            plz = query;
-            preOpenViews(Constants.AGE_CHART);
-            updatePlz();
+    @Override
+    public void onBackPressed() {
+        if(!searchView.isIconified()) {
+            searchView.setIconified(true);
+            return;
         }
-        if (Constants.PLZ_INTENT.equals(intent.getAction())) {
-            plz = intent.getStringExtra(Constants.PLZ_EXTRA);
-            String preopen = intent.getStringExtra(Constants.PREOPEN_EXTRA);
-            if(preopen != null){
-                preOpenViews(preopen);
-            } else {
-                preOpenViews(Constants.AGE_CHART);
-            }
-            updatePlz();
-        }
+        super.onBackPressed();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-
-        // Associate searchable configuration with the SearchView
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        configureSearchView(menu);
 
         return true;
     }
@@ -169,6 +168,7 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         }
     }
 
+    // API Callbacks
     @Override
     public void receiveResponse(String result, String callId) {
 
@@ -209,6 +209,144 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
     }
 
+    private void handleIntent(Intent intent) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            plz = query;
+            preOpenViews(Constants.AGE_CHART);
+            updatePlz();
+        }
+        if (Constants.PLZ_INTENT.equals(intent.getAction())) {
+            plz = intent.getStringExtra(Constants.PLZ_EXTRA);
+            String preopen = intent.getStringExtra(Constants.PREOPEN_EXTRA);
+            if(preopen != null){
+                preOpenViews(preopen);
+            } else {
+                preOpenViews(Constants.AGE_CHART);
+            }
+            updatePlz();
+        }
+    }
+
+    private void setupUIListener(){
+        hideShowListener = new HideShowListener(this);
+        ageHeader.setOnClickListener(hideShowListener);
+        ageEqualHeader.setOnClickListener(hideShowListener);
+        genderHeader.setOnClickListener(hideShowListener);
+        locationHeader.setOnClickListener(hideShowListener);
+        locationEqualHeader.setOnClickListener(hideShowListener);
+        durationHeader.setOnClickListener(hideShowListener);
+        durationEqualHeader.setOnClickListener(hideShowListener);
+        foreignersHeader.setOnClickListener(hideShowListener);
+        foreignersEqualHeader.setOnClickListener(hideShowListener);
+    }
+
+    private void setupRatingPopup(){
+
+        // TODO: Replace with check for location
+        if(plz.startsWith("12")){
+
+            // Create popup with buttons
+            popUpLayout = getLayoutInflater().inflate(R.layout.popup_rating, null); // inflating popup layout
+            ratingPopup = new PopupWindow(popUpLayout, LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT, true); // creation of popup
+            Button cancelRatingButton = (Button) popUpLayout.findViewById(R.id.cancel_rating_button);
+            Button saveRatingButton = (Button) popUpLayout.findViewById(R.id.save_rating_button);
+            cancelRatingButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ratingPopup.dismiss();
+                }
+            });
+            saveRatingButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ratingPopup.dismiss();
+                    ratePlzHeader.setVisibility(View.GONE);
+                }
+            });
+
+            // Show Rate Header and add onClickListener to open popup
+            ratePlzHeader.setVisibility(View.VISIBLE);
+            ratePlzHeader.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    if(UserLoginControl.isLoggedIn(v.getContext())) {
+                        ratingPopup.showAtLocation(popUpLayout, Gravity.CENTER, 10, 10);
+                    }
+                    else {
+                    // Send to login screen if not logged in
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    startActivity(intent);
+                    }
+                }
+            });
+        }
+    }
+
+    private void configureSearchView(Menu menu){
+        // Set up adapter
+        searchAdapter = new SimpleCursorAdapter(this,
+                R.layout.suggestion_textview,
+                null,
+                new String[] {"plz"},
+                new int[] {android.R.id.text1},
+                CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+
+        // Associate searchable configuration with the SearchView
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        // Configure Suggestions
+        searchView.setSuggestionsAdapter(searchAdapter);
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionClick(int position) {
+                String selected = suggestions.get(position);
+                String plz = selected.split(" ")[0];
+                Intent intent = new Intent(getApplicationContext(), PLZActivity.class);
+                intent.setAction(Constants.PLZ_INTENT);
+                intent.putExtra(Constants.PLZ_EXTRA, plz);
+                startActivity(intent);
+                return true;
+            }
+
+            @Override
+            public boolean onSuggestionSelect(int position) {
+                return true;
+            }
+        });
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                populateAdapter(s);
+                return false;
+            }
+        });
+
+        LinearLayout linearLayout1 = (LinearLayout) searchView.getChildAt(0);
+        LinearLayout linearLayout2 = (LinearLayout) linearLayout1.getChildAt(2);
+        LinearLayout linearLayout3 = (LinearLayout) linearLayout2.getChildAt(1);
+        AutoCompleteTextView autoComplete = (AutoCompleteTextView) linearLayout3.getChildAt(0);
+        autoComplete.setDropDownBackgroundResource(R.color.graph_transdarkblue);
+    }
+
+    private void populateAdapter(String query) {
+        final MatrixCursor cursor = new MatrixCursor(new String[]{ BaseColumns._ID, "plz" });
+        suggestions = CSVParser.getPLZSuggestionForQuery(this, query);
+        for (int i=0; i<suggestions.size(); i++) {
+            cursor.addRow(new Object[] {i, suggestions.get(i)});
+        }
+        searchAdapter.changeCursor(cursor);
+    }
+
     private void preOpenViews(String chartType){
         LinearLayout layout;
 
@@ -224,6 +362,9 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
                 break;
             case Constants.DURATION_CHART:
                 layout = durationHeader;
+                break;
+            case Constants.FOREIGNERS_CHART:
+                layout = foreignersHeader;
                 break;
             default:
                 return;
@@ -294,6 +435,57 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         }
     }
 
+    private void createEqualRegionViews(List<String> data, String chartType){
+        LinearLayout layout;
+
+        switch(chartType) {
+            case Constants.AGE_CHART:
+                layout = ageEqualLinearLayout;
+                break;
+            case Constants.LOCATION_CHART:
+                layout = locationEqualLinearLayout;
+                break;
+            case Constants.DURATION_CHART:
+                layout = durationEqualLinearLayout;
+                break;
+            case Constants.FOREIGNERS_CHART:
+                layout = foreignersEqualLinearLayout;
+                break;
+            default:
+                return;
+        }
+
+        layout.removeAllViews();
+
+        for(int i=0; i<data.size(); i++){
+            TextView textView = new TextView(this);
+
+            int margin = (int) getResources().getDimension(R.dimen.subitem_margin);
+
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
+            params.setMargins(margin, margin, margin, margin);
+            textView.setLayoutParams(params);
+
+            // Set plz and chartType as tags to access them in OnClickListener
+            textView.setTag(R.string.plz_tag, data.get(i));
+            textView.setTag(R.string.charttype_tag, chartType);
+
+            textView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getApplicationContext(), PLZActivity.class);
+                    intent.setAction(Constants.PLZ_INTENT);
+                    intent.putExtra(Constants.PLZ_EXTRA, (String) v.getTag(R.string.plz_tag));
+                    intent.putExtra(Constants.PREOPEN_EXTRA, (String) v.getTag(R.string.charttype_tag));
+                    startActivity(intent);
+                }
+            });
+
+            textView.setText(data.get(i) + " " + dataHandler.fetchPLZName(data.get(i)));
+            layout.addView(textView);
+        }
+    }
+
     private LinearLayout createSingleTwitterView(String text, boolean onclick){
         LinearLayout linearLayout = new LinearLayout(this);
         TextView textView = new TextView(this);
@@ -346,7 +538,7 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
     }
 
-    // DataReceiver Interface
+    // DataReceiver Interface<
 
     @Override
     public void dataToChart(ChartAttributes attrs, String chartType, int[] colors) {
@@ -422,15 +614,23 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         switch (chartType){
             case Constants.AGE_CHART:
                 ageChart.setColumnChartData(data);
+                ageChart.setZoomEnabled(false);
                 break;
             case Constants.GENDER_CHART:
                 genderChart.setColumnChartData(data);
+                genderChart.setZoomEnabled(false);
                 break;
              case Constants.LOCATION_CHART:
                 locationChart.setColumnChartData(data);
+                locationChart.setZoomEnabled(false);
                 break;
              case Constants.DURATION_CHART:
                 durationChart.setColumnChartData(data);
+                durationChart.setZoomEnabled(false);
+                break;
+            case Constants.FOREIGNERS_CHART:
+                foreignersChart.setColumnChartData(data);
+                foreignersChart.setZoomEnabled(false);
                 break;
         }
 
@@ -439,53 +639,7 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
     @Override
     public void dataToViews(List<String> data, String chartType){
-
-        LinearLayout layout;
-
-        switch(chartType) {
-            case Constants.AGE_CHART:
-                layout = ageEqualLinearLayout;
-                break;
-            case Constants.LOCATION_CHART:
-                layout = locationEqualLinearLayout;
-                break;
-            case Constants.DURATION_CHART:
-                layout = durationEqualLinearLayout;
-                break;
-            default:
-                return;
-        }
-
-        layout.removeAllViews();
-
-        for(int i=0; i<data.size(); i++){
-            TextView textView = new TextView(this);
-
-            int margin = (int) getResources().getDimension(R.dimen.subitem_margin);
-
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
-            params.setMargins(margin, margin, margin, margin);
-            textView.setLayoutParams(params);
-
-            // Set plz and chartType as tags to access them in OnClickListener
-            textView.setTag(R.string.plz_tag, data.get(i));
-            textView.setTag(R.string.charttype_tag, chartType);
-
-            textView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(getApplicationContext(), PLZActivity.class);
-                    intent.setAction(Constants.PLZ_INTENT);
-                    intent.putExtra(Constants.PLZ_EXTRA, (String) v.getTag(R.string.plz_tag));
-                    intent.putExtra(Constants.PREOPEN_EXTRA, (String) v.getTag(R.string.charttype_tag));
-                    startActivity(intent);
-                }
-            });
-
-            textView.setText(data.get(i) + " " + dataHandler.fetchPLZName(data.get(i)));
-            layout.addView(textView);
-        }
-
+        createEqualRegionViews(data, chartType);
     }
 
 }

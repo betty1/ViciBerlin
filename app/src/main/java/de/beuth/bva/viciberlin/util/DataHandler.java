@@ -79,6 +79,16 @@ public class DataHandler {
         receiver.dataToChart(durationAttrs, Constants.DURATION_CHART, null);
         receiver.dataToViews(durationMostEquals, Constants.DURATION_CHART);
 
+        PLZResult foreigners = CSVParser.fetchPLZResult(context, "auslaender.csv", plz);
+        float[] foreignersValues = foreigners.getValues();
+        List<String> foreignersMostEquals = foreigners.getMostEquals();
+
+        float[] foreignersAverages = CSVParser.getFloatValuesForPLZ(context, "auslaender.csv", "average");
+        String[] foreignersLabels = new String[]{res.getString(R.string.foreign_residents)};
+        ChartAttributes foreignersAttrs = new ChartAttributes(foreignersValues, foreignersAverages, foreignersLabels, "", res.getString(R.string.percent));
+        receiver.dataToChart(foreignersAttrs, Constants.FOREIGNERS_CHART, null);
+        receiver.dataToViews(foreignersMostEquals, Constants.FOREIGNERS_CHART);
+
 //        area = CSVParser.getFloatValuesForPLZ(context, "area.csv", plz)[0];
     }
 

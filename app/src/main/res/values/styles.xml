@@ -10,6 +10,7 @@
         <item name="subBar">@style/SubBar.Green</item>
     </style>
 
+
     <style name="RoseTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/bars_darkcyan</item>
         <item name="colorPrimaryDark">@color/bars_darkpurple</item>
@@ -113,6 +114,17 @@
     <style name="BlueTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="RatingBar" parent="Theme.AppCompat">
+        <item name="colorControlNormal">@color/graph_purple</item>
+    </style>
+
+    <style name="EqualRegionText" parent="Theme.AppCompat">
+        <item name="android:textSize">12sp</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
     </style>
 
     <style name="BlueTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

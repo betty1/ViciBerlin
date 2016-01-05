@@ -27,6 +27,9 @@ public class HideShowListener implements View.OnClickListener {
         viewMap.put(R.id.location_equal_header, new Integer[]{R.id.location_equal_linearlayout, R.id.location_equal_arrow});
         viewMap.put(R.id.duration_header, new Integer[]{R.id.duration_linearlayout, R.id.duration_arrow});
         viewMap.put(R.id.duration_equal_header, new Integer[]{R.id.duration_equal_linearlayout, R.id.duration_equal_arrow});
+        viewMap.put(R.id.foreigners_header, new Integer[]{R.id.foreigners_linearlayout, R.id.foreigners_arrow});
+        viewMap.put(R.id.foreigners_equal_header, new Integer[]{R.id.foreigners_equal_linearlayout, R.id.foreigners_equal_arrow});
+
     }
 
     @Override

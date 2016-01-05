@@ -1,441 +1,698 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.emilsjolander.components.StickyScrollViewItems.StickyScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/sticky_scroll"
-    android:layout_height="match_parent" android:layout_width="match_parent"
-    android:animateLayoutChanges="true" >
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    android:animateLayoutChanges="true"
+    >
 
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@android:color/white"
-        android:animateLayoutChanges="true"
-        >
+        style="?primaryBar"
+        android:orientation="horizontal"
+        android:tag="sticky"
+        android:background="@android:color/holo_red_dark"
+        android:id="@+id/rate_plz_header"
+        android:visibility="gone">
 
-        <LinearLayout
-            android:orientation="horizontal"
-            style="?primaryBar"
-            android:tag="sticky"
-            >
-
-            <TextView
-                style="?primaryBarText"
-                android:text="@string/demography"
-            />
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            style="?secondaryBar"
-            android:id="@+id/age_header">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/age_arrow"
-                android:src="@drawable/android_arrow"
-                android:layout_gravity="center_vertical"
-                android:tag="up"
-                />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/age"
-                android:padding="10dp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/age_linearlayout"
-            android:animateLayoutChanges="true"
-            android:visibility="gone">
-
-            <lecho.lib.hellocharts.view.ColumnChartView
-                android:id="@+id/age_chart"
-                android:layout_width="fill_parent"
-                android:layout_height="200dp"
-                android:background="@android:color/white"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp" />
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/age_equal_header"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:gravity="center_vertical">
-
-                <ImageView
-                    android:layout_width="10dp"
-                    android:layout_height="5dp"
-                    android:id="@+id/age_equal_arrow"
-                    android:src="@drawable/android_arrow"
-                    android:layout_gravity="center_vertical"
-                    android:tag="up" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/equal_regions"
-                    android:padding="10dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/age_equal_linearlayout"
-                android:visibility="gone"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                ></LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            style="?secondaryBar"
-            android:id="@+id/gender_header">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/gender_arrow"
-                android:src="@drawable/android_arrow"
-                android:layout_gravity="center_vertical"
-                android:tag="up" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/gender"
-                android:padding="10dp"
-                />
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/gender_linearlayout"
-            android:visibility="gone"
-            android:animateLayoutChanges="true" >
-
-            <lecho.lib.hellocharts.view.ColumnChartView
-                android:id="@+id/gender_chart"
-                android:layout_width="fill_parent"
-                android:layout_height="200dp"
-                android:background="@android:color/white"
-                android:layout_margin="20dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            style="?secondaryBar"
-            android:id="@+id/location_header">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/location_arrow"
-                android:src="@drawable/android_arrow"
-                android:layout_gravity="center_vertical"
-                android:tag="up" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/location"
-                android:padding="10dp"
-                />
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/location_linearlayout"
-            android:visibility="gone"
-            android:animateLayoutChanges="true" >
-
-            <lecho.lib.hellocharts.view.ColumnChartView
-                android:id="@+id/location_chart"
-                android:layout_width="fill_parent"
-                android:layout_height="200dp"
-                android:background="@android:color/white"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginRight="20dp" />
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/location_equal_header"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:gravity="center_vertical" >
-
-                <ImageView
-                    android:layout_width="10dp"
-                    android:layout_height="5dp"
-                    android:id="@+id/location_equal_arrow"
-                    android:src="@drawable/android_arrow"
-                    android:layout_gravity="center_vertical"
-                    android:tag="up" />
-
-                <TextView
-                    android:id="@+id/textView2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/equal_regions"
-                    android:padding="10dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/location_equal_linearlayout"
-                android:visibility="gone"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            style="?secondaryBar"
-            android:id="@+id/duration_header">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/duration_arrow"
-                android:src="@drawable/android_arrow"
-                android:layout_gravity="center_vertical"
-                android:tag="up" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/duration"
-                android:padding="10dp"
-                />
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/duration_linearlayout"
-            android:visibility="gone"
-            android:animateLayoutChanges="true" >
-
-            <lecho.lib.hellocharts.view.ColumnChartView
-                android:id="@+id/duration_chart"
-                android:layout_width="fill_parent"
-                android:layout_height="200dp"
-                android:background="@android:color/white"
-                android:layout_margin="20dp" />
-
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/duration_equal_header"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:gravity="center_vertical" >
-
-                <ImageView
-                    android:layout_width="10dp"
-                    android:layout_height="5dp"
-                    android:id="@+id/duration_equal_arrow"
-                    android:src="@drawable/android_arrow"
-                    android:layout_gravity="center_vertical"
-                    android:tag="up" />
-
-                <TextView
-                    android:id="@+id/textView3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/equal_regions"
-                    android:padding="10dp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/duration_equal_linearlayout"
-                android:visibility="gone"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            style="?primaryBar"
-            android:tag="sticky"
-            >
-
-            <TextView
-                style="?primaryBarText"
-                android:text="@string/yelp"
-                />
-
-            <ProgressBar
-                style="?android:attr/progressBarStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/yelp_progressbar"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:visibility="invisible" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-
-            <LinearLayout
-                android:orientation="horizontal"
-                style="?secondaryBar">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/restaurants"
-                    android:layout_gravity="center_vertical" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:textStyle="bold"
-                    android:textColor="@android:color/white"
-                    android:id="@+id/restaurants_textview"
-                    android:layout_gravity="center_vertical"
-                    />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="8dp"
-                    android:textColor="@android:color/white"
-                    android:text="@string/per_km2"
-                    android:id="@+id/restaurant_xtratextview"
-                    android:layout_gravity="center_vertical"
-                    />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                style="?secondaryBar"
-                >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/cafes"
-                    android:layout_gravity="center_vertical"
-                    />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:textStyle="bold"
-                    android:textColor="@android:color/white"
-                    android:id="@+id/cafes_textview"
-                    android:layout_gravity="center_vertical"
-                    />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="8dp"
-                    android:text="@string/per_km2"
-                    android:textColor="@android:color/white"
-                    android:id="@+id/cafes_xtratextview"
-                    android:layout_gravity="center_vertical"
-                    />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:orientation="horizontal"
-                style="?secondaryBar"
-                >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/nightlife"
-                    android:layout_gravity="center_vertical"
-                    />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text=""
-                    android:textStyle="bold"
-                    android:textColor="@android:color/white"
-                    android:id="@+id/nightlife_textview"
-                    android:layout_gravity="center_vertical"
-                    />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="8dp"
-                    android:text="@string/per_km2"
-                    android:textColor="@android:color/white"
-                    android:id="@+id/nightlife_xtratextview"
-                    android:layout_gravity="center_vertical"
-                    />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:tag="sticky"
-            style="?primaryBar"
-            >
-
-            <TextView
-                style="?primaryBarText"
-                android:text="@string/twitter"
-                />
-
-            <ProgressBar
-                style="?android:attr/progressBarStyleSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/twitter_progressbar"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:visibility="invisible" />
-        </LinearLayout>
-
-        <org.apmem.tools.layouts.FlowLayout
-            android:id="@+id/twitter_flowlayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-        </org.apmem.tools.layouts.FlowLayout>
-
-
+        <TextView
+            style="?primaryBarText"
+            android:text="@string/rate_this"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
-</com.emilsjolander.components.StickyScrollViewItems.StickyScrollView>
+    <com.emilsjolander.components.StickyScrollViewItems.StickyScrollView
+        android:id="@+id/sticky_scroll"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:animateLayoutChanges="true">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@android:color/white"
+            android:animateLayoutChanges="true"
+            >
+
+            <LinearLayout
+                android:orientation="horizontal"
+                style="?primaryBar"
+                android:tag="sticky"
+                >
+
+                <TextView
+                    style="?primaryBarText"
+                    android:text="@string/demography"
+                />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                style="?secondaryBar"
+                android:id="@+id/age_header">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/age_arrow"
+                    android:src="@drawable/android_arrow"
+                    android:layout_gravity="center_vertical"
+                    android:tag="up"
+                    />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/age"
+                    android:padding="10dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/age_linearlayout"
+                android:animateLayoutChanges="true"
+                android:visibility="gone"
+                android:layout_margin="10dp">
+
+                <lecho.lib.hellocharts.view.ColumnChartView
+                    android:id="@+id/age_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:background="@android:color/white"
+                    android:paddingTop="10dp"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:text="@string/key_average"
+                    android:textColor="@color/graph_gray" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/age_equal_header"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="10dp"
+                        android:layout_height="5dp"
+                        android:id="@+id/age_equal_arrow"
+                        android:src="@drawable/android_arrow"
+                        android:layout_gravity="center_vertical"
+                        android:tag="up" />
+
+                    <TextView
+                        android:text="@string/equal_regions"
+                        style="@style/EqualRegionText" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/age_equal_linearlayout"
+                    android:visibility="gone"></LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                style="?secondaryBar"
+                android:id="@+id/gender_header">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/gender_arrow"
+                    android:src="@drawable/android_arrow"
+                    android:layout_gravity="center_vertical"
+                    android:tag="up" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/gender"
+                    android:padding="10dp"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/gender_linearlayout"
+                android:visibility="gone"
+                android:animateLayoutChanges="true"
+                android:layout_margin="10dp">
+
+                <lecho.lib.hellocharts.view.ColumnChartView
+                    android:id="@+id/gender_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:background="@android:color/white"
+                    android:paddingTop="10dp"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:text="@string/key_average"
+                    android:textColor="@color/graph_gray" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                style="?secondaryBar"
+                android:id="@+id/location_header">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/location_arrow"
+                    android:src="@drawable/android_arrow"
+                    android:layout_gravity="center_vertical"
+                    android:tag="up" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/location"
+                    android:padding="10dp"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/location_linearlayout"
+                android:visibility="gone"
+                android:animateLayoutChanges="true"
+                android:layout_margin="10dp">
+
+                <lecho.lib.hellocharts.view.ColumnChartView
+                    android:id="@+id/location_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:background="@android:color/white"
+                    android:paddingTop="10dp"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:text="@string/key_average"
+                    android:textColor="@color/graph_gray" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/location_equal_header"
+                    android:gravity="center_vertical" >
+
+                    <ImageView
+                        android:layout_width="10dp"
+                        android:layout_height="5dp"
+                        android:id="@+id/location_equal_arrow"
+                        android:src="@drawable/android_arrow"
+                        android:layout_gravity="center_vertical"
+                        android:tag="up" />
+
+                    <TextView
+                        android:text="@string/equal_regions"
+                        style="@style/EqualRegionText" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/location_equal_linearlayout"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                style="?secondaryBar"
+                android:id="@+id/duration_header">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/duration_arrow"
+                    android:src="@drawable/android_arrow"
+                    android:layout_gravity="center_vertical"
+                    android:tag="up" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/duration"
+                    android:padding="10dp"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/duration_linearlayout"
+                android:visibility="gone"
+                android:animateLayoutChanges="true"
+                android:layout_margin="10dp">
+
+                <lecho.lib.hellocharts.view.ColumnChartView
+                    android:id="@+id/duration_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:background="@android:color/white"
+                    android:paddingTop="10dp"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:text="@string/key_average"
+                    android:textColor="@color/graph_gray" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/duration_equal_header"
+                    android:gravity="center_vertical" >
+
+                    <ImageView
+                        android:layout_width="10dp"
+                        android:layout_height="5dp"
+                        android:id="@+id/duration_equal_arrow"
+                        android:src="@drawable/android_arrow"
+                        android:layout_gravity="center_vertical"
+                        android:tag="up" />
+
+                    <TextView
+                        android:text="@string/equal_regions"
+                        style="@style/EqualRegionText" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/duration_equal_linearlayout"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                style="?secondaryBar"
+                android:id="@+id/foreigners_header">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/foreigners_arrow"
+                    android:src="@drawable/android_arrow"
+                    android:layout_gravity="center_vertical"
+                    android:tag="up" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/foreigners"
+                    android:padding="10dp"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/foreigners_linearlayout"
+                android:visibility="gone"
+                android:animateLayoutChanges="true"
+                android:layout_margin="10dp">
+
+                <lecho.lib.hellocharts.view.ColumnChartView
+                    android:id="@+id/foreigners_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:background="@android:color/white"
+                    android:paddingTop="10dp"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:text="@string/key_average"
+                    android:textColor="@color/graph_gray" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/foreigners_equal_header"
+                    android:gravity="center_vertical" >
+
+                    <ImageView
+                        android:layout_width="10dp"
+                        android:layout_height="5dp"
+                        android:id="@+id/foreigners_equal_arrow"
+                        android:src="@drawable/android_arrow"
+                        android:layout_gravity="center_vertical"
+                        android:tag="up" />
+
+                    <TextView
+                        android:text="@string/equal_regions"
+                        style="@style/EqualRegionText" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/foreigners_equal_linearlayout"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <LinearLayout
+                style="?primaryBar"
+                android:orientation="horizontal"
+                android:tag="sticky"
+                android:id="@+id/userrating_header">
+
+                <TextView
+                    style="?primaryBarText"
+                    android:text="@string/userratings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <ProgressBar
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/progressBar"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:visibility="invisible" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/userrating_linearlayout"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/culture"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1" />
+
+                    <io.techery.properratingbar.ProperRatingBar
+                        android:id="@+id/ratingBar2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp"
+                        android:textStyle="bold"
+                        app:prb_defaultRating="3"
+                        app:prb_symbolicTick=" * "
+                        app:prb_symbolicTickNormalColor="@color/graph_gray"
+                        app:prb_symbolicTickSelectedColor="@color/graph_purple"
+                        app:prb_totalTicks="5"
+                        app:prb_clickable="false"
+                        android:layout_weight="1" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/infrastructure"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1" />
+
+                    <io.techery.properratingbar.ProperRatingBar
+                        android:id="@+id/ratingBar3"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp"
+                        android:textStyle="bold"
+                        app:prb_defaultRating="3"
+                        app:prb_symbolicTick=" * "
+                        app:prb_symbolicTickNormalColor="@color/graph_gray"
+                        app:prb_symbolicTickSelectedColor="@color/graph_purple"
+                        app:prb_totalTicks="5"
+                        app:prb_clickable="false"
+                        android:layout_weight="1" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/green"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1" />
+
+                    <io.techery.properratingbar.ProperRatingBar
+                        android:id="@+id/ratingBar4"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp"
+                        android:textStyle="bold"
+                        app:prb_defaultRating="3"
+                        app:prb_symbolicTick=" * "
+                        app:prb_symbolicTickNormalColor="@color/graph_gray"
+                        app:prb_symbolicTickSelectedColor="@color/graph_purple"
+                        app:prb_totalTicks="5"
+                        app:prb_clickable="false"
+                        android:layout_weight="1" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/safety"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="1" />
+
+                    <io.techery.properratingbar.ProperRatingBar
+                        android:id="@+id/ratingBar5"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp"
+                        android:textStyle="bold"
+                        app:prb_defaultRating="3"
+                        app:prb_symbolicTick=" * "
+                        app:prb_symbolicTickNormalColor="@color/graph_gray"
+                        app:prb_symbolicTickSelectedColor="@color/graph_purple"
+                        app:prb_totalTicks="5"
+                        app:prb_clickable="false"
+                        android:layout_weight="1" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                style="?primaryBar"
+                android:tag="sticky"
+                android:id="@+id/yelp_header">
+
+                <TextView
+                    style="?primaryBarText"
+                    android:text="@string/yelp"
+                    />
+
+                <ProgressBar
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/yelp_progressbar"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:visibility="invisible" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/yelp_linearlayout">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    style="?secondaryBar">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/restaurants"
+                        android:layout_gravity="center_vertical" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:id="@+id/restaurants_textview"
+                        android:layout_gravity="center_vertical"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="8dp"
+                        android:textColor="@android:color/white"
+                        android:text="@string/per_km2"
+                        android:id="@+id/restaurant_xtratextview"
+                        android:layout_gravity="center_vertical"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    style="?secondaryBar"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/cafes"
+                        android:layout_gravity="center_vertical"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:id="@+id/cafes_textview"
+                        android:layout_gravity="center_vertical"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="8dp"
+                        android:text="@string/per_km2"
+                        android:textColor="@android:color/white"
+                        android:id="@+id/cafes_xtratextview"
+                        android:layout_gravity="center_vertical"
+                        />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    style="?secondaryBar"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nightlife"
+                        android:layout_gravity="center_vertical"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:id="@+id/nightlife_textview"
+                        android:layout_gravity="center_vertical"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="8dp"
+                        android:text="@string/per_km2"
+                        android:textColor="@android:color/white"
+                        android:id="@+id/nightlife_xtratextview"
+                        android:layout_gravity="center_vertical"
+                        />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:tag="sticky"
+                style="?primaryBar"
+                android:id="@+id/twitter_header">
+
+                <TextView
+                    style="?primaryBarText"
+                    android:text="@string/twitter"
+                    />
+
+                <ProgressBar
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/twitter_progressbar"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:visibility="invisible" />
+            </LinearLayout>
+
+            <org.apmem.tools.layouts.FlowLayout
+                android:id="@+id/twitter_flowlayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+            </org.apmem.tools.layouts.FlowLayout>
+
+
+        </LinearLayout>
+
+    </com.emilsjolander.components.StickyScrollViewItems.StickyScrollView>
+</LinearLayout>

@@ -3,6 +3,7 @@ package de.beuth.bva.viciberlin.ui;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.MatrixCursor;
 import android.provider.BaseColumns;
@@ -12,11 +13,15 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
@@ -34,8 +39,7 @@ import de.beuth.bva.viciberlin.R;
 import de.beuth.bva.viciberlin.util.CSVParser;
 import de.beuth.bva.viciberlin.util.Constants;
 import de.beuth.bva.viciberlin.ui.util.CustomMapView;
-import de.beuth.bva.viciberlin.util.DataHandler;
-import de.beuth.bva.viciberlin.util.GeoProvider;
+import de.beuth.bva.viciberlin.geo.GeoProvider;
 
 public class MainActivity extends AppCompatActivity implements CustomMapView.LocationPressListener {
 
@@ -44,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements CustomMapView.Loc
     @Bind(R.id.drawer_layout) DrawerLayout drawerLayout;
     @Bind(R.id.nav_login_icon) ImageButton loginIcon;
     @Bind(R.id.nav_info_icon) ImageButton infoIcon;
+    @Bind(R.id.map_progress_layer) FrameLayout mapProgressLayer;
 
     private ActionBarDrawerToggle drawerToggle;
     private SimpleCursorAdapter searchAdapter;
@@ -65,48 +70,17 @@ public class MainActivity extends AppCompatActivity implements CustomMapView.Loc
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-
-        // Associate searchable configuration with the SearchView
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setSuggestionsAdapter(searchAdapter);
-        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
-            @Override
-            public boolean onSuggestionClick(int position) {
-                String selected = suggestions.get(position);
-                String plz = selected.split(" ")[0];
-                Intent intent = new Intent(getApplicationContext(), PLZActivity.class);
-                intent.setAction(Constants.PLZ_INTENT);
-                intent.putExtra(Constants.PLZ_EXTRA, plz);
-                startActivity(intent);
-                return true;
-            }
-
-            @Override
-            public boolean onSuggestionSelect(int position) {
-                return true;
-            }
-        });
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                populateAdapter(s);
-                return false;
-            }
-        });
-
+        configureSearchView(menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
+        if(item.getItemId() == R.id.location_item){
+            Log.i(TAG, "Location pressed");
+            return true;
+        }
         if (drawerToggle.onOptionsItemSelected(item))
         { return true; }
         return super.onOptionsItemSelected(item);
@@ -140,17 +114,69 @@ public class MainActivity extends AppCompatActivity implements CustomMapView.Loc
         loginIcon.setOnClickListener(navListener);
         infoIcon.setOnClickListener(navListener);
 
-        final String[] from = new String[] {"plz"};
-        final int[] to = new int[] {android.R.id.text1};
-        searchAdapter = new SimpleCursorAdapter(this,
-                android.R.layout.simple_list_item_1,
-                null,
-                from,
-                to,
-                CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
-
     }
 
+    private void configureSearchView(Menu menu){
+        // Set up adapter
+        searchAdapter = new SimpleCursorAdapter(this,
+                R.layout.suggestion_textview,
+                null,
+                new String[] {"plz"},
+                new int[] {android.R.id.text1},
+                CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+
+        // Associate searchable configuration with the SearchView
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        // Configure Suggestions
+        searchView.setSuggestionsAdapter(searchAdapter);
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionClick(int position) {
+                String selected = suggestions.get(position);
+                String plz = selected.split(" ")[0];
+                Intent intent = new Intent(getApplicationContext(), PLZActivity.class);
+                intent.setAction(Constants.PLZ_INTENT);
+                intent.putExtra(Constants.PLZ_EXTRA, plz);
+                startActivity(intent);
+                return true;
+            }
+
+            @Override
+            public boolean onSuggestionSelect(int position) {
+                return true;
+            }
+        });
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                populateAdapter(s);
+                return false;
+            }
+        });
+
+        LinearLayout linearLayout1 = (LinearLayout) searchView.getChildAt(0);
+        LinearLayout linearLayout2 = (LinearLayout) linearLayout1.getChildAt(2);
+        LinearLayout linearLayout3 = (LinearLayout) linearLayout2.getChildAt(1);
+        AutoCompleteTextView autoComplete = (AutoCompleteTextView) linearLayout3.getChildAt(0);
+        autoComplete.setDropDownBackgroundResource(R.color.graph_transdarkblue);
+    }
+
+    private void populateAdapter(String query) {
+        final MatrixCursor cursor = new MatrixCursor(new String[]{ BaseColumns._ID, "plz" });
+        suggestions = CSVParser.getPLZSuggestionForQuery(this, query);
+        for (int i=0; i<suggestions.size(); i++) {
+            cursor.addRow(new Object[] {i, suggestions.get(i)});
+        }
+        searchAdapter.changeCursor(cursor);
+    }
 
     private void setupMap(){
         mapView.setTileSource(TileSourceFactory.MAPNIK);
@@ -169,17 +195,18 @@ public class MainActivity extends AppCompatActivity implements CustomMapView.Loc
         mapView.setScrollableAreaLimit(new BoundingBoxE6(52.673235, 13.762254, 52.338880, 13.089341));
     }
 
-    private void populateAdapter(String query) {
-        final MatrixCursor cursor = new MatrixCursor(new String[]{ BaseColumns._ID, "plz" });
-        suggestions = CSVParser.getPLZSuggestionForQuery(this, query);
-        for (int i=0; i<suggestions.size(); i++) {
-            cursor.addRow(new Object[] {i, suggestions.get(i)});
-        }
-        searchAdapter.changeCursor(cursor);
+    private String getTwitterUserId(){
+        SharedPreferences prefs = getSharedPreferences(Constants.SHARED_PREFS_VICI, MODE_PRIVATE);
+        String twitterUserId = prefs.getString(Constants.TWITTER_USERID, null);
+        String twitterUsername = prefs.getString(Constants.TWITTER_USERNAME, null);
+        Log.i(TAG, "twitterUsername is " + twitterUsername);
+        Log.i(TAG, "twitterUserId is " + twitterUserId);
+        return twitterUserId;
     }
 
     @Override
     public void onLocationPress(double lat, double lng) {
+
         String plz = GeoProvider.plzFromLatLng(this, lat, lng);
 
         if(plz == GeoProvider.NO_SERVER_RESPONSE){
@@ -195,21 +222,22 @@ public class MainActivity extends AppCompatActivity implements CustomMapView.Loc
         startActivity(intent);
     }
 
+
     private class NavigationOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
             Intent intent = null;
             switch (v.getId()){
                 case R.id.nav_login_icon:
-                    intent = new Intent(getApplicationContext(), PLZActivity.class);
-                    intent.setAction(Constants.PLZ_INTENT);
-                    intent.putExtra(Constants.PLZ_EXTRA, "10405");
+                    if(getTwitterUserId() != null){
+                        intent = new Intent(getApplicationContext(), LogoutActivity.class);
+                    } else {
+                        intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    }
                     break;
                 case R.id.nav_info_icon:
-                    intent = new Intent(getApplicationContext(), PLZActivity.class);
-                    intent.setAction(Constants.PLZ_INTENT);
-                    intent.putExtra(Constants.PLZ_EXTRA, "10409");
-                    break;
+                    onBackPressed();
+                    return;
             }
             if(intent != null){
                 startActivity(intent);

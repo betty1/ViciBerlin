@@ -2,10 +2,17 @@
     <string name="app_name">ViciBerlin</string>
     <string name="search_hint">Suche Postleitzahl</string>
     <string name="search_title">PLZ</string>
+    <string name="lcoation_item_title">Location</string>
 
     <!--Main-->
     <string name="sub_title">Alles über Deine Nachbarschaft</string>
     <string name="press_long_or_choose_plz">Drücke lang auf einen Ort oder suche direkt nach einer Postleitzahl</string>
+
+    <!--Login-->
+    <string name="login_description">Melde Dich an, um Bewertungen für die Kieze abzugeben.</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
+    <string name="logged_in_as">Angemeldet als&#160;</string>
 
     <!--Titles-->
     <string name="demography">Demographie</string>
@@ -13,12 +20,22 @@
     <string name="gender">Frauen/Männer</string>
     <string name="location">Wohnlage</string>
     <string name="duration">Wohndauer</string>
+    <string name="foreigners">Ausländeranteil</string>
     <string name="restaurants">Restaurants:&#160;</string>
     <string name="cafes">Cafés:&#160;</string>
     <string name="nightlife">Nightlife:&#160;</string>
     <string name="equal_regions">Ähnliche Bezirke</string>
     <string name="yelp">Yelp</string>
     <string name="twitter">Twitter</string>
+    <string name="userratings">Userbewertungen</string>
+    <string name="rate_this">Bewerte diesen Kiez</string>
+
+    <!--Rating-->
+    <string name="please_rate">Bewerte den Kiez</string>
+    <string name="culture">Gastro / Kultur</string>
+    <string name="infrastructure">Infrastruktur</string>
+    <string name="green">Grünflächen</string>
+    <string name="safety">Sicherheit</string>
 
     <!--Labels-->
     <string name="percent">Prozent</string>
@@ -33,7 +50,9 @@
     <string name="less_than_5_years">unter 5 Jahre</string>
     <string name="five_to_10_years">5-10 Jahre</string>
     <string name="more_than_10_years">über 10 Jahre</string>
+    <string name="foreign_residents">Ausländische Einwohner</string>
     <string name="per_km2">&#160;pro km2</string>
+    <string name="key_average">grau: Berliner Durchschnitt</string>
 
     <!--Hints-->
     <string name="no_berlin_zipcode">Bitte wählen Sie eine Berliner PLZ</string>
@@ -46,6 +65,10 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+
+    <!--Buttons-->
+    <string name="cancel">Abbrechen</string>
+    <string name="save">Speichern</string>
 
     <!--Tags-->
     <string name="plz_tag">plzTag</string>

@@ -1,5 +1,21 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
 apply plugin: 'com.android.application'
-
+apply plugin: 'io.fabric'
+repositories {
+    maven {
+        url 'https://maven.fabric.io/public'
+    }
+    maven {
+        url 'https://jitpack.io'
+    }
+}
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
@@ -27,7 +43,6 @@ dependencies {
     compile 'se.emilsjolander:StickyScrollViewItems:1.1.0'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.github.lecho:hellocharts-library:1.5.8@aar'
-    compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'com.squareup.okhttp:okhttp:2.5.0'
     compile 'com.google.code.gson:gson:2.4'
     compile 'org.glassfish:javax.annotation:10.0-b28'
@@ -36,4 +51,11 @@ dependencies {
     compile 'org.apmem.tools:layouts:1.10'
     compile 'org.osmdroid:osmdroid-android:5.0.1@aar'
     compile 'com.android.support:design:23.1.1'
+    compile('com.twitter.sdk.android:twitter-core:1.6.2@aar') {
+        transitive = true;
+    }
+    compile 'com.github.techery:ProperRatingBar:v0.0.2'
+    compile 'com.google.android.gms:play-services-location:8.4.0'
+    compile 'com.google.android.gms:play-services-identity:8.4.0'
+
 }

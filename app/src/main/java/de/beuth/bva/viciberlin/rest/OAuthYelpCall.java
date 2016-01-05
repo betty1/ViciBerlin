@@ -34,6 +34,7 @@ public class OAuthYelpCall {
     private static final String SEARCH_PATH = "/v2/search";
 
     private static final String LOCATION_STRING = "berlin+de";
+    private static final int LOCATION_RADIUS = 700;
 
     private static final String CONSUMER_KEY = "DEnMAeUtRuTCVMX_BPGKjA";
     private static final String CONSUMER_SECRET = "BRLmIpG-zxnjMK10QqYVc8CXqR0";
@@ -83,7 +84,7 @@ public class OAuthYelpCall {
         }
     }
 
-        /**
+    /**
      * Creates and sends a request to the Search API by term and location.
      * <p>
      * See <a href="http://www.yelp.com/developers/documentation/v2/search_api">Yelp Search API V2</a>
@@ -98,7 +99,7 @@ public class OAuthYelpCall {
         request.addQuerystringParameter("term", term);
         request.addQuerystringParameter("location", plz + "+" + LOCATION_STRING);
         request.addQuerystringParameter("limit", String.valueOf(SEARCH_LIMIT));
-        request.addQuerystringParameter("radius_filter", String.valueOf(700));
+        request.addQuerystringParameter("radius_filter", String.valueOf(LOCATION_RADIUS));
         return sendRequestAndGetResponse(request);
     }
 

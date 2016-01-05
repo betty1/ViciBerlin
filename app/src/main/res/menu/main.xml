@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/location_item"
+        android:title="@string/lcoation_item_title"
+        android:icon="@mipmap/ic_location"
+        app:showAsAction="ifRoom" />
     <item android:id="@+id/search"
           android:title="@string/search_title"
           android:icon="@drawable/ic_search_api_holo_light"

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#44000000">
+
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="20dp"
+    android:id="@+id/popup_linearlayout"
+    android:background="@android:color/white"
+    android:layout_margin="10dp"
+    android:layout_gravity="center">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/please_rate"
+        android:textSize="20sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="10dp" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/culture"
+            android:textSize="16sp" />
+
+        <io.techery.properratingbar.ProperRatingBar
+            android:id="@+id/culture_ratingbar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            app:prb_defaultRating="3"
+            app:prb_symbolicTick=" * "
+            app:prb_symbolicTickNormalColor="@color/graph_gray"
+            app:prb_symbolicTickSelectedColor="@color/graph_purple"
+            app:prb_totalTicks="5"
+            app:prb_clickable="true"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/infrastructure"
+        android:textSize="16sp" />
+
+    <io.techery.properratingbar.ProperRatingBar
+        android:id="@+id/infrastructure_ratingbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:prb_defaultRating="3"
+        app:prb_symbolicTick=" * "
+        app:prb_symbolicTickNormalColor="@color/graph_gray"
+        app:prb_symbolicTickSelectedColor="@color/graph_purple"
+        app:prb_totalTicks="5"
+        app:prb_clickable="true"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal" />
+
+</LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/green"
+            android:textSize="16sp" />
+
+        <io.techery.properratingbar.ProperRatingBar
+            android:id="@+id/green_ratingbar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            app:prb_defaultRating="3"
+            app:prb_symbolicTick=" * "
+            app:prb_symbolicTickNormalColor="@color/graph_gray"
+            app:prb_symbolicTickSelectedColor="@color/graph_purple"
+            app:prb_totalTicks="5"
+            app:prb_clickable="true"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/safety"
+            android:textSize="16sp" />
+
+        <io.techery.properratingbar.ProperRatingBar
+            android:id="@+id/safety_ratingbar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            app:prb_defaultRating="3"
+            app:prb_symbolicTick=" * "
+            app:prb_symbolicTickNormalColor="@color/graph_gray"
+            app:prb_symbolicTickSelectedColor="@color/graph_purple"
+            app:prb_totalTicks="5"
+            app:prb_clickable="true"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal" />
+
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel"
+            android:id="@+id/cancel_rating_button" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save"
+            android:id="@+id/save_rating_button" />
+    </LinearLayout>
+
+</LinearLayout>
+</FrameLayout>

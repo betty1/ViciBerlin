@@ -6,6 +6,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import org.osmdroid.DefaultResourceProxyImpl;
@@ -23,14 +24,7 @@ public class CustomMapView extends MapView {
     double longitude;
     double latitude;
 
-    // The bounding box around all map points
-    // Used to determine the correct zoom level to show everything
-    private int minLat = Integer.MAX_VALUE;
-    private int minLon = Integer.MAX_VALUE;
-    private int maxLat = Integer.MIN_VALUE;
-    private int maxLon = Integer.MIN_VALUE;
-
-    private BoundingBoxE6 boundingBox;
+    Projection proj;
 
     LocationPressListener pressListener;
 
@@ -56,10 +50,7 @@ public class CustomMapView extends MapView {
         int actionType = ev.getAction();
         switch (actionType) {
             case MotionEvent.ACTION_DOWN:
-                Projection proj = this.getProjection();
-                IGeoPoint loc = proj.fromPixels((int) ev.getX(), (int) ev.getY());
-                latitude = (double) loc.getLatitudeE6()/1000000;
-                longitude = (double)loc.getLongitudeE6()/1000000;
+                proj = this.getProjection();
         }
         gestureDetector.onTouchEvent(ev);
         return super.dispatchTouchEvent(ev);
@@ -73,6 +64,9 @@ public class CustomMapView extends MapView {
         @Override
         public void onLongPress(MotionEvent e) {
             if(pressListener != null){
+                IGeoPoint loc = proj.fromPixels((int) e.getX(), (int) e.getY());
+                latitude = (double) loc.getLatitudeE6()/1000000;
+                longitude = (double)loc.getLongitudeE6()/1000000;
                 pressListener.onLocationPress(latitude, longitude);
             }
             Log.d(TAG, "Longitude: "+ longitude +" Latitude: "+ latitude);
