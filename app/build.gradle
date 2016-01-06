@@ -38,6 +38,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile project(':volley')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'se.emilsjolander:StickyScrollViewItems:1.1.0'
@@ -56,6 +57,4 @@ dependencies {
     }
     compile 'com.github.techery:ProperRatingBar:v0.0.2'
     compile 'com.google.android.gms:play-services-location:8.4.0'
-    compile 'com.google.android.gms:play-services-identity:8.4.0'
-
 }

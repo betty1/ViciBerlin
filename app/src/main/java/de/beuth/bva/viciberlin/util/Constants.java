@@ -28,4 +28,8 @@ public class Constants {
     public static final String TWITTER_AUTH_SECRET = "TwitterAuthSecret";
     public static final String TWITTER_USERNAME = "TwitterUsername";
     public static final String TWITTER_USERID = "TwitterUserid";
+
+    // Rating API
+    public static final String RATING_URL = "http://vici-berlin.herokuapp.com/rating/";
+
 }

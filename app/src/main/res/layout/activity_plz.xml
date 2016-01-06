@@ -433,7 +433,7 @@
                         android:layout_weight="1" />
 
                     <io.techery.properratingbar.ProperRatingBar
-                        android:id="@+id/ratingBar2"
+                        android:id="@+id/culture_ratingbar"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textSize="30sp"
@@ -461,7 +461,7 @@
                         android:layout_weight="1" />
 
                     <io.techery.properratingbar.ProperRatingBar
-                        android:id="@+id/ratingBar3"
+                        android:id="@+id/infrastructure_ratingbar"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textSize="30sp"
@@ -489,7 +489,7 @@
                         android:layout_weight="1" />
 
                     <io.techery.properratingbar.ProperRatingBar
-                        android:id="@+id/ratingBar4"
+                        android:id="@+id/green_ratingbar"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textSize="30sp"
@@ -517,7 +517,7 @@
                         android:layout_weight="1" />
 
                     <io.techery.properratingbar.ProperRatingBar
-                        android:id="@+id/ratingBar5"
+                        android:id="@+id/safety_ratingbar"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textSize="30sp"

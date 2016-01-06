@@ -145,11 +145,10 @@ public class DataHandler {
         return 0;
     }
 
-    public String[] fetchGoogleLatLong(String result) {
+    public String[] fetchGoogleLatLong(JSONObject result) {
         String[] latLong = new String[2];
         try {
-            JSONObject jsonResult = new JSONObject(result);
-            JSONArray resultArray = jsonResult.getJSONArray("results");
+            JSONArray resultArray = result.getJSONArray("results");
             JSONObject geometry = resultArray.getJSONObject(0).getJSONObject("geometry");
             Log.d(TAG, "Found geometry: " + geometry);
             JSONObject location = geometry.getJSONObject("location");
@@ -162,6 +161,25 @@ public class DataHandler {
             Log.d(TAG, "Error parsing Google Lat Long JSON");
         }
         return latLong;
+    }
+
+    public int[] fetchRatingResults(JSONObject result) {
+        int[] ratingValues = new int[4];
+        try {
+            String culture = result.getString("culture");
+            String infrastructure = result.getString("infrastructure");
+            String green = result.getString("green");
+            String safety = result.getString("safety");
+
+            ratingValues[0] = Integer.parseInt(culture);
+            ratingValues[1] = Integer.parseInt(infrastructure);
+            ratingValues[2] = Integer.parseInt(green);
+            ratingValues[3] = Integer.parseInt(safety);
+
+        } catch (Exception e){
+            Log.d(TAG, "Error parsing rating values");
+        }
+        return ratingValues;
     }
 
     public interface DataReceiver {

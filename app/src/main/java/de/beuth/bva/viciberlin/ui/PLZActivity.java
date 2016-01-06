@@ -16,7 +16,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,8 +30,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apmem.tools.layouts.FlowLayout;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.Bind;
@@ -41,7 +42,8 @@ import de.beuth.bva.viciberlin.R;
 import de.beuth.bva.viciberlin.model.ChartAttributes;
 import de.beuth.bva.viciberlin.rest.OAuthTwitterCall;
 import de.beuth.bva.viciberlin.rest.OAuthYelpCall;
-import de.beuth.bva.viciberlin.rest.RestCall;
+import de.beuth.bva.viciberlin.rest.RestCallback;
+import de.beuth.bva.viciberlin.rest.VolleyRestProvider;
 import de.beuth.bva.viciberlin.util.CSVParser;
 import de.beuth.bva.viciberlin.util.Constants;
 import de.beuth.bva.viciberlin.util.DataHandler;
@@ -57,7 +59,7 @@ import lecho.lib.hellocharts.model.SubcolumnValue;
 import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.ColumnChartView;
 
-public class PLZActivity extends AppCompatActivity implements RestCall.RestCallback, OAuthTwitterCall.OAuthTwitterCallback, OAuthYelpCall.OAuthYelpCallback, DataHandler.DataReceiver {
+public class PLZActivity extends AppCompatActivity implements RestCallback, OAuthTwitterCall.OAuthTwitterCallback, OAuthYelpCall.OAuthYelpCallback, DataHandler.DataReceiver {
 
     @Bind(R.id.age_header) LinearLayout ageHeader;
     @Bind(R.id.age_chart) ColumnChartView ageChart;
@@ -92,6 +94,11 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
     @Bind(R.id.rate_plz_header) LinearLayout ratePlzHeader;
 
+    @Bind(R.id.culture_ratingbar) ProperRatingBar cultureRatingBar;
+    @Bind(R.id.infrastructure_ratingbar) ProperRatingBar infrastructureRatingBar;
+    @Bind(R.id.green_ratingbar) ProperRatingBar greenRatingBar;
+    @Bind(R.id.safety_ratingbar) ProperRatingBar safetyRatingBar;
+
     PopupWindow ratingPopup;
     View popUpLayout;
 
@@ -102,9 +109,13 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
     final String YELP_RESTAURANT_CALLID = "yelpRestaurantCall";
     final String YELP_NIGHTLIFE_CALLID = "yelpNightlifeCall";
     final String YELP_CAFES_CALLID = "yelpCafesCall";
+    final String RATING_POST_CALLID = "ratingPostCall";
+    final String RATING_GET_CALLID = "ratingGetCall";
 
     Resources res;
     DataHandler dataHandler;
+    VolleyRestProvider restProvider;
+
     HideShowListener hideShowListener;
 
     private SimpleCursorAdapter searchAdapter;
@@ -123,6 +134,7 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
         ButterKnife.bind(this);
         res = getResources();
         dataHandler = new DataHandler(this, this);
+        restProvider = new VolleyRestProvider(this, this);
 
         setupUIListener();
 
@@ -173,40 +185,58 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
     public void receiveResponse(String result, String callId) {
 
         switch(callId){
-            // 1. Get lat long values from result
-            // 2. Make Twitter call
-            case GOOGLE_LATLONG_CALLID:
-                latLong = dataHandler.fetchGoogleLatLong(result);
-                Log.d(TAG, "Received long lat response" + result);
-                twitterCall();
-                break;
-            // Create Twitter views from result
             case TWITTER_CALLID:
+                // Create Twitter views from result
                 createTwitterViews(result);
                 Log.d(TAG, "Twitter: " + result);
                 twitterProgressBar.setVisibility(View.INVISIBLE);
                 break;
-            // Set Yelp Restaurant Textview
             case YELP_RESTAURANT_CALLID:
+                // Set Yelp Restaurant Textview
                 Log.d(TAG, "Yelp: " + result);
                 int restaurantCount = dataHandler.fetchYelpTotals(result);
                 restaurantTextView.setText(restaurantCount + " ");
                 break;
-            // Set Yelp Cafes Textview
             case YELP_CAFES_CALLID:
+                // Set Yelp Cafes Textview
                 Log.d(TAG, "Yelp: " + result);
                 int cafeCount = dataHandler.fetchYelpTotals(result);
                 cafesTextView.setText(cafeCount + " ");
                 break;
-            // Set Yelp Nightlife Textview
             case YELP_NIGHTLIFE_CALLID:
+                // Set Yelp Nightlife Textview
                 Log.d(TAG, "Yelp: " + result);
                 int nightlifeCount = dataHandler.fetchYelpTotals(result);
                 nightlifeTextView.setText(nightlifeCount + " ");
                 yelpProgressBar.setVisibility(View.INVISIBLE);
                 break;
+            case RATING_POST_CALLID:
+                Log.d(TAG, "Rating Post responded: " + result);
+                restProvider.makeGETJSONRequest(Constants.RATING_URL + plz + "/", RATING_GET_CALLID);
         }
+    }
 
+    @Override
+    public void receiveResponse(JSONObject result, String callId) {
+        switch (callId) {
+            case GOOGLE_LATLONG_CALLID:
+                // 1. Get lat long values from result
+                // 2. Make Twitter call
+                latLong = dataHandler.fetchGoogleLatLong(result);
+                Log.d(TAG, "Received long lat response" + result);
+                twitterCall();
+                break;
+            case RATING_GET_CALLID:
+                Log.d(TAG, "Rating GET responded: " + result);
+                int[] ratingValues = dataHandler.fetchRatingResults(result);
+                if(ratingValues.length == 4){
+                    cultureRatingBar.setRating(ratingValues[0]);
+                    infrastructureRatingBar.setRating(ratingValues[1]);
+                    greenRatingBar.setRating(ratingValues[2]);
+                    safetyRatingBar.setRating(ratingValues[3]);
+                }
+                break;
+        }
     }
 
     private void handleIntent(Intent intent) {
@@ -250,6 +280,8 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
             popUpLayout = getLayoutInflater().inflate(R.layout.popup_rating, null); // inflating popup layout
             ratingPopup = new PopupWindow(popUpLayout, LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.MATCH_PARENT, true); // creation of popup
+
+            // Set Button ClickListeners
             Button cancelRatingButton = (Button) popUpLayout.findViewById(R.id.cancel_rating_button);
             Button saveRatingButton = (Button) popUpLayout.findViewById(R.id.save_rating_button);
             cancelRatingButton.setOnClickListener(new View.OnClickListener() {
@@ -261,6 +293,7 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
             saveRatingButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    restProvider.makePOSTRequest(Constants.RATING_URL, RATING_POST_CALLID, getRatingParams());
                     ratingPopup.dismiss();
                     ratePlzHeader.setVisibility(View.GONE);
                 }
@@ -283,6 +316,41 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
                 }
             });
         }
+    }
+
+    private HashMap<String, String> getRatingParams(){
+        // Get user id
+        String userId = UserLoginControl.getUserId(this);
+        if(userId == null){
+            return null;
+        }
+
+        // Set basic params
+        HashMap<String, String> params = new HashMap<>();
+        params.put("zipcode", String.valueOf(plz));
+        params.put("user_id", String.valueOf(userId));
+
+        // Fetch rating values
+        ProperRatingBar cultureRating = (ProperRatingBar) popUpLayout.findViewById(R.id.culture_ratingbar);
+        ProperRatingBar infraRating = (ProperRatingBar) popUpLayout.findViewById(R.id.infrastructure_ratingbar);
+        ProperRatingBar greenRating = (ProperRatingBar) popUpLayout.findViewById(R.id.green_ratingbar);
+        ProperRatingBar safetyRating = (ProperRatingBar) popUpLayout.findViewById(R.id.safety_ratingbar);
+
+        int culture = cultureRating.getRating();
+        int infrastructure = infraRating.getRating();
+        int green = greenRating.getRating();
+        int safety = safetyRating.getRating();
+        // (For now) 'Total' is average out of all values
+        int total = (int)Math.round((culture + infrastructure + green + safety)/4.0);
+
+        // Set values to params
+        params.put("culture", String.valueOf(culture));
+        params.put("infrastructure", String.valueOf(infrastructure));
+        params.put("green", String.valueOf(green));
+        params.put("safety", String.valueOf(safety));
+        params.put("total", String.valueOf(total));
+
+        return params;
     }
 
     private void configureSearchView(Menu menu){
@@ -394,13 +462,10 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
         // Start Location Call and Yelp Call
         if(plz != null && !plz.equals("")) {
-            apiCall("https://maps.googleapis.com/maps/api/geocode/json?address=" + plz + ",berlin", GOOGLE_LATLONG_CALLID);
+            restProvider.makeGETJSONRequest("https://maps.googleapis.com/maps/api/geocode/json?address=" + plz + ",berlin", GOOGLE_LATLONG_CALLID);
+            restProvider.makeGETJSONRequest(Constants.RATING_URL + plz + "/", RATING_GET_CALLID);
             yelpCalls();
         }
-    }
-
-    private void apiCall(String url, String callId){
-        RestCall.startAPICall(url, callId, this);
     }
 
     private void twitterCall(){
@@ -538,7 +603,7 @@ public class PLZActivity extends AppCompatActivity implements RestCall.RestCallb
 
     }
 
-    // DataReceiver Interface<
+    // DataReceiver Interface
 
     @Override
     public void dataToChart(ChartAttributes attrs, String chartType, int[] colors) {

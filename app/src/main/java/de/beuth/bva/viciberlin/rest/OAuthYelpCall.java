@@ -121,7 +121,6 @@ public class OAuthYelpCall {
      * @return <tt>String</tt> body of API response
      */
     private static String sendRequestAndGetResponse(OAuthRequest request) {
-        System.out.println("Querying " + request.getCompleteUrl() + " ...");
         OAuthYelpCall.service.signRequest(OAuthYelpCall.accessToken, request);
         Response response = request.send();
         return response.getBody();
