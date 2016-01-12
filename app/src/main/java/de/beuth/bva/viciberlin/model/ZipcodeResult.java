@@ -5,12 +5,12 @@ import java.util.List;
 /**
  * Created by betty on 07/12/15.
  */
-public class PLZResult {
+public class ZipCodeResult {
 
     float[] values;
     List<String> mostEquals;
 
-    public PLZResult(float[] values, List<String> mostEquals) {
+    public ZipCodeResult(float[] values, List<String> mostEquals) {
         this.values = values;
         this.mostEquals = mostEquals;
     }

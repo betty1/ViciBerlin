@@ -19,6 +19,10 @@ repositories {
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
 
     defaultConfig {
         applicationId "de.beuth.bva.viciberlin"
@@ -57,4 +61,5 @@ dependencies {
     }
     compile 'com.github.techery:ProperRatingBar:v0.0.2'
     compile 'com.google.android.gms:play-services-location:8.4.0'
+    compile 'com.github.MKergall.osmbonuspack:OSMBonusPack:v5.6'
 }

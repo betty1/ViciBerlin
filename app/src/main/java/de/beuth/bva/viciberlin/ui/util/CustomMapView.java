@@ -24,8 +24,6 @@ public class CustomMapView extends MapView {
     double longitude;
     double latitude;
 
-    Projection proj;
-
     LocationPressListener pressListener;
 
     public CustomMapView(final Context context, final AttributeSet attrs) {
@@ -50,7 +48,10 @@ public class CustomMapView extends MapView {
         int actionType = ev.getAction();
         switch (actionType) {
             case MotionEvent.ACTION_DOWN:
-                proj = this.getProjection();
+                Projection proj = this.getProjection();
+                IGeoPoint loc = proj.fromPixels((int) ev.getX(), (int) ev.getY());
+                latitude = (double) loc.getLatitudeE6()/1000000;
+                longitude = (double)loc.getLongitudeE6()/1000000;
         }
         gestureDetector.onTouchEvent(ev);
         return super.dispatchTouchEvent(ev);
@@ -64,9 +65,6 @@ public class CustomMapView extends MapView {
         @Override
         public void onLongPress(MotionEvent e) {
             if(pressListener != null){
-                IGeoPoint loc = proj.fromPixels((int) e.getX(), (int) e.getY());
-                latitude = (double) loc.getLatitudeE6()/1000000;
-                longitude = (double)loc.getLongitudeE6()/1000000;
                 pressListener.onLocationPress(latitude, longitude);
             }
             Log.d(TAG, "Longitude: "+ longitude +" Latitude: "+ latitude);

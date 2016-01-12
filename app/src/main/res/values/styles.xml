@@ -5,7 +5,7 @@
         <item name="colorPrimary">@color/bars_green</item>
         <item name="colorPrimaryDark">@color/bars_darkgreen</item>
         <item name="primaryBar">@style/PrimaryBar.Green</item>
-        <item name="primaryBarText">@style/PrimaryBarText.Green</item>
+        <item name="primaryBarText">@style/BarText.Primary.Green</item>
         <item name="secondaryBar">@style/SecondaryBar.Green</item>
         <item name="subBar">@style/SubBar.Green</item>
     </style>
@@ -15,7 +15,7 @@
         <item name="colorPrimary">@color/bars_darkcyan</item>
         <item name="colorPrimaryDark">@color/bars_darkpurple</item>
         <item name="primaryBar">@style/PrimaryBar.Rose</item>
-        <item name="primaryBarText">@style/PrimaryBarText.Rose</item>
+        <item name="primaryBarText">@style/BarText.Primary.Rose</item>
         <item name="secondaryBar">@style/SecondaryBar.Rose</item>
         <item name="subBar">@style/SubBar.Rose</item>
     </style>
@@ -24,7 +24,7 @@
         <item name="colorPrimary">@color/bars_blue</item>
         <item name="colorPrimaryDark">@color/bars_darkblue</item>
         <item name="primaryBar">@style/PrimaryBar.Blue</item>
-        <item name="primaryBarText">@style/PrimaryBarText.Blue</item>
+        <item name="primaryBarText">@style/BarText.Primary.Blue</item>
         <item name="secondaryBar">@style/SecondaryBar.Blue</item>
         <item name="subBar">@style/SubBar.Blue</item>
     </style>
@@ -32,6 +32,7 @@
     <style name="PrimaryBar">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">50dp</item>
+        <item name="android:orientation">horizontal</item>
         <item name="android:padding">15dp</item>
         <item name="android:gravity">center_vertical</item>
     </style>
@@ -51,21 +52,26 @@
         <item name="android:textColor">@android:color/black</item>
     </style>
 
-    <style name="PrimaryBarText">
+    <style name="BarText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:layout_gravity">center_vertical</item>
+    </style>
+
+    <style name="BarText.Primary">
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="PrimaryBarText.Rose">
+    <style name="BarText.Primary.Rose">
         <item name="android:textColor">@android:color/black</item>
     </style>
 
-    <style name="PrimaryBarText.Green">
+    <style name="BarText.Primary.Green">
         <item name="android:textColor">@android:color/white</item>
     </style>
 
-    <style name="PrimaryBarText.Blue">
+    <style name="BarText.Primary.Blue">
         <item name="android:textColor">@android:color/white</item>
     </style>
 
@@ -73,6 +79,7 @@
     <style name="SecondaryBar">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">40dp</item>
+        <item name="android:orientation">horizontal</item>
         <item name="android:paddingLeft">10dp</item>
         <item name="android:paddingRight">10dp</item>
     </style>
@@ -116,16 +123,80 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="RatingBar" parent="Theme.AppCompat">
+    <style name="SubLayout">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_margin">10dp</item>
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="RatingBar">
         <item name="colorControlNormal">@color/graph_purple</item>
     </style>
 
-    <style name="EqualRegionText" parent="Theme.AppCompat">
+    <style name="ColumnChart">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">200dp</item>
+        <item name="android:background">@android:color/white</item>
+        <item name="android:paddingTop">10dp</item>
+    </style>
+
+    <style name="KeyTextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">12sp</item>
-        <item name="android:padding">10dp</item>
+        <item name="android:textColor">@color/graph_gray</item>
+    </style>
+
+    <!--EQUALS-->
+    <style name="EqualHeader">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
     </style>
+
+    <style name="EqualHeaderText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:padding">10dp</item>
+    </style>
+
+    <style name="EqualLayout">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:visibility">gone</item>
+    </style>
+    <!--EQUALS END-->
+
+    <!--ARROWS-->
+    <style name="ArrowBig">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:src">@drawable/android_arrow_white</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:tag">"up_white"</item>
+    </style>
+
+    <style name="ArrowMedium">
+        <item name="android:layout_width">14dp</item>
+        <item name="android:layout_height">7dp</item>
+        <item name="android:src">@drawable/android_arrow</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:tag">"up"</item>
+    </style>
+
+    <style name="ArrowSmall">
+        <item name="android:layout_width">10dp</item>
+        <item name="android:layout_height">5dp</item>
+        <item name="android:src">@drawable/android_arrow</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:tag">"up"</item>
+    </style>
+    <!--ARROWS END-->
 
     <style name="BlueTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 

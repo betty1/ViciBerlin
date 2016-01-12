@@ -15,6 +15,7 @@
     <string name="logged_in_as">Angemeldet als&#160;</string>
 
     <!--Titles-->
+    <string name="mapview">Kartenansicht</string>
     <string name="demography">Demographie</string>
     <string name="age">Alter</string>
     <string name="gender">Frauen/Männer</string>
@@ -24,11 +25,17 @@
     <string name="restaurants">Restaurants:&#160;</string>
     <string name="cafes">Cafés:&#160;</string>
     <string name="nightlife">Nightlife:&#160;</string>
-    <string name="equal_regions">Ähnliche Bezirke</string>
     <string name="yelp">Yelp</string>
     <string name="twitter">Twitter</string>
     <string name="userratings">Userbewertungen</string>
     <string name="rate_this">Bewerte diesen Kiez</string>
+
+    <!--Equal Regions-->
+    <string name="equal_age">Ähnliche Bezirke (Altersverteilung)</string>
+    <string name="equal_gender">Ähnliche Bezirke (Geschlechterverteilung)</string>
+    <string name="equal_location">Ähnliche Bezirke (Wohnlage)</string>
+    <string name="equal_duration">Ähnliche Bezirke (Wohndauer)</string>
+    <string name="equal_foreigners">Ähnliche Bezirke (Ausländeranteil)</string>
 
     <!--Rating-->
     <string name="please_rate">Bewerte den Kiez</string>

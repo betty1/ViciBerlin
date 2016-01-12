@@ -7,6 +7,7 @@ import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.database.MatrixCursor;
 import android.graphics.Color;
+import android.location.Location;
 import android.net.Uri;
 import android.provider.BaseColumns;
 import android.support.v4.content.ContextCompat;
@@ -31,6 +32,10 @@ import android.widget.Toast;
 
 import org.apmem.tools.layouts.FlowLayout;
 import org.json.JSONObject;
+import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.overlays.Marker;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,12 +44,15 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import de.beuth.bva.viciberlin.R;
+import de.beuth.bva.viciberlin.geo.GeoProvider;
+import de.beuth.bva.viciberlin.geo.GoogleLocationProvider;
 import de.beuth.bva.viciberlin.model.ChartAttributes;
 import de.beuth.bva.viciberlin.rest.OAuthTwitterCall;
 import de.beuth.bva.viciberlin.rest.OAuthYelpCall;
 import de.beuth.bva.viciberlin.rest.RestCallback;
 import de.beuth.bva.viciberlin.rest.VolleyRestProvider;
-import de.beuth.bva.viciberlin.util.CSVParser;
+import de.beuth.bva.viciberlin.ui.util.CustomMiniMapView;
+import de.beuth.bva.viciberlin.util.CSVParserForZipCodes;
 import de.beuth.bva.viciberlin.util.Constants;
 import de.beuth.bva.viciberlin.util.DataHandler;
 import de.beuth.bva.viciberlin.ui.util.HideShowListener;
@@ -54,15 +62,18 @@ import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Column;
 import lecho.lib.hellocharts.model.ColumnChartData;
-import lecho.lib.hellocharts.model.Line;
 import lecho.lib.hellocharts.model.SubcolumnValue;
 import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.ColumnChartView;
 
-public class PLZActivity extends AppCompatActivity implements RestCallback, OAuthTwitterCall.OAuthTwitterCallback, OAuthYelpCall.OAuthYelpCallback, DataHandler.DataReceiver {
+public class PLZActivity extends AppCompatActivity implements RestCallback, OAuthTwitterCall.OAuthTwitterCallback, OAuthYelpCall.OAuthYelpCallback, DataHandler.DataReceiver, GoogleLocationProvider.LocationListener {
+
+    @Bind(R.id.map_header) LinearLayout mapHeader;
+    @Bind(R.id.mini_map) CustomMiniMapView miniMapView;
 
     @Bind(R.id.age_header) LinearLayout ageHeader;
     @Bind(R.id.age_chart) ColumnChartView ageChart;
+    @Bind(R.id.age_history_chart) ColumnChartView ageHistoryChart;
     @Bind(R.id.age_equal_header) LinearLayout ageEqualHeader;
     @Bind(R.id.age_equal_linearlayout) LinearLayout ageEqualLinearLayout;
 
@@ -81,6 +92,7 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
 
     @Bind(R.id.foreigners_header) LinearLayout foreignersHeader;
     @Bind(R.id.foreigners_chart) ColumnChartView foreignersChart;
+    @Bind(R.id.foreigners_history_chart) ColumnChartView foreignersHistoryChart;
     @Bind(R.id.foreigners_equal_header) LinearLayout foreignersEqualHeader;
     @Bind(R.id.foreigners_equal_linearlayout) LinearLayout foreignersEqualLinearLayout;
 
@@ -99,6 +111,10 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
     @Bind(R.id.green_ratingbar) ProperRatingBar greenRatingBar;
     @Bind(R.id.safety_ratingbar) ProperRatingBar safetyRatingBar;
 
+    @Bind(R.id.zoom_in_button) Button zoomInButton;
+    @Bind(R.id.zoom_out_button) Button zoomOutButton;
+
+
     PopupWindow ratingPopup;
     View popUpLayout;
 
@@ -116,6 +132,8 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
     DataHandler dataHandler;
     VolleyRestProvider restProvider;
 
+    IMapController mapController;
+
     HideShowListener hideShowListener;
 
     private SimpleCursorAdapter searchAdapter;
@@ -124,6 +142,11 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
 
     String plz = "";
     String[] latLong = new String[2];
+
+    // Location
+    GoogleLocationProvider locationProvider;
+    String zipCodeOfUser;
+    boolean isZipCodeOfUser = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,6 +159,10 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
         dataHandler = new DataHandler(this, this);
         restProvider = new VolleyRestProvider(this, this);
 
+        locationProvider = new GoogleLocationProvider(this, this);
+        locationProvider.setupGoogleApiClient();
+
+        setupMap();
         setupUIListener();
 
         // Search Intent
@@ -144,6 +171,21 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
         }
 
         setupRatingPopup();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // If User Location is unknown, setup Location Updates
+        if(zipCodeOfUser == null){
+            locationProvider.setupGoogleApiClient();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        locationProvider.stopLocationUpdates();
     }
 
     @Override
@@ -170,10 +212,22 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
         switch (item.getItemId()) {
             case android.R.id.home:
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent = new Intent(getApplicationContext(), MainActivity.class);
                 startActivity(intent);
+                return true;
+            case R.id.location_item:
+                if(zipCodeOfUser != null){
+                    intent = new Intent(getApplicationContext(), PLZActivity.class);
+                    intent.setAction(Constants.PLZ_INTENT);
+                    intent.putExtra(Constants.PLZ_EXTRA, zipCodeOfUser);
+                    intent.putExtra(Constants.ZIPOFUSER_EXTRA, true);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(this, "Bitte aktivieren Sie Location Services und warten Sie einen Moment, damit Ihr Standort ermittelt werden kann.", Toast.LENGTH_LONG).show();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -222,9 +276,11 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
             case GOOGLE_LATLONG_CALLID:
                 // 1. Get lat long values from result
                 // 2. Make Twitter call
+                // 3. Center minimap to lat long
                 latLong = dataHandler.fetchGoogleLatLong(result);
                 Log.d(TAG, "Received long lat response" + result);
                 twitterCall();
+                setMapCenter();
                 break;
             case RATING_GET_CALLID:
                 Log.d(TAG, "Rating GET responded: " + result);
@@ -248,18 +304,25 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
         }
         if (Constants.PLZ_INTENT.equals(intent.getAction())) {
             plz = intent.getStringExtra(Constants.PLZ_EXTRA);
+
+            // Look up intent extra, to know which view to open on create
             String preopen = intent.getStringExtra(Constants.PREOPEN_EXTRA);
             if(preopen != null){
                 preOpenViews(preopen);
             } else {
                 preOpenViews(Constants.AGE_CHART);
             }
+
+            // Is this the zipcode where the user is located? Then show rating header
+            isZipCodeOfUser = intent.getBooleanExtra(Constants.ZIPOFUSER_EXTRA, false);
+
             updatePlz();
         }
     }
 
     private void setupUIListener(){
         hideShowListener = new HideShowListener(this);
+        mapHeader.setOnClickListener(hideShowListener);
         ageHeader.setOnClickListener(hideShowListener);
         ageEqualHeader.setOnClickListener(hideShowListener);
         genderHeader.setOnClickListener(hideShowListener);
@@ -273,48 +336,47 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
 
     private void setupRatingPopup(){
 
-        // TODO: Replace with check for location
-        if(plz.startsWith("12")){
+        // Create popup with buttons
+        popUpLayout = getLayoutInflater().inflate(R.layout.popup_rating, null); // inflating popup layout
+        ratingPopup = new PopupWindow(popUpLayout, LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT, true); // creation of popup
 
-            // Create popup with buttons
-            popUpLayout = getLayoutInflater().inflate(R.layout.popup_rating, null); // inflating popup layout
-            ratingPopup = new PopupWindow(popUpLayout, LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT, true); // creation of popup
+        // Set Button ClickListeners
+        Button cancelRatingButton = (Button) popUpLayout.findViewById(R.id.cancel_rating_button);
+        Button saveRatingButton = (Button) popUpLayout.findViewById(R.id.save_rating_button);
+        cancelRatingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ratingPopup.dismiss();
+            }
+        });
+        saveRatingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                restProvider.makePOSTRequest(Constants.RATING_URL, RATING_POST_CALLID, getRatingParams());
+                ratingPopup.dismiss();
+                ratePlzHeader.setVisibility(View.GONE);
+            }
+        });
 
-            // Set Button ClickListeners
-            Button cancelRatingButton = (Button) popUpLayout.findViewById(R.id.cancel_rating_button);
-            Button saveRatingButton = (Button) popUpLayout.findViewById(R.id.save_rating_button);
-            cancelRatingButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ratingPopup.dismiss();
+        // Show Rate Header and add onClickListener to open popup
+        ratePlzHeader.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(UserLoginControl.isLoggedIn(v.getContext())) {
+                    ratingPopup.showAtLocation(popUpLayout, Gravity.CENTER, 10, 10);
                 }
-            });
-            saveRatingButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    restProvider.makePOSTRequest(Constants.RATING_URL, RATING_POST_CALLID, getRatingParams());
-                    ratingPopup.dismiss();
-                    ratePlzHeader.setVisibility(View.GONE);
+                else {
+                // Send to login screen if not logged in
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivity(intent);
                 }
-            });
+            }
+        });
 
-            // Show Rate Header and add onClickListener to open popup
+        if(isZipCodeOfUser){
             ratePlzHeader.setVisibility(View.VISIBLE);
-            ratePlzHeader.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    if(UserLoginControl.isLoggedIn(v.getContext())) {
-                        ratingPopup.showAtLocation(popUpLayout, Gravity.CENTER, 10, 10);
-                    }
-                    else {
-                    // Send to login screen if not logged in
-                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                    startActivity(intent);
-                    }
-                }
-            });
         }
     }
 
@@ -351,6 +413,50 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
         params.put("total", String.valueOf(total));
 
         return params;
+    }
+
+    private void setupMap(){
+        miniMapView.setTileSource(TileSourceFactory.MAPNIK);
+
+        mapController = miniMapView.getController();
+        mapController.setZoom(12);
+        miniMapView.setMinZoomLevel(11);
+        miniMapView.setMaxZoomLevel(19);
+
+        // Set on default map center
+        setMapCenter();
+
+        miniMapView.invalidate();
+
+        View.OnClickListener zoomButtonListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(v.getId() == R.id.zoom_in_button){
+                    mapController.zoomIn();
+                } else if(v.getId() == R.id.zoom_out_button) {
+                    mapController.zoomOut();
+                }
+                setMapCenter();
+            }
+        };
+
+        zoomInButton.setOnClickListener(zoomButtonListener);
+        zoomOutButton.setOnClickListener(zoomButtonListener);
+    }
+
+    private void setMapCenter(){
+        GeoPoint startPoint;
+        try {
+            startPoint = new GeoPoint(Double.parseDouble(latLong[0]), Double.parseDouble(latLong[1]));
+        } catch(Exception e) {
+            startPoint = new GeoPoint(13.3833, 52.5167);
+        }
+        mapController.setCenter(startPoint);
+        Marker startMarker = new Marker(miniMapView);
+        startMarker.setPosition(startPoint);
+        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        miniMapView.getOverlays().add(startMarker);
+        miniMapView.invalidate();
     }
 
     private void configureSearchView(Menu menu){
@@ -394,11 +500,12 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
 
             @Override
             public boolean onQueryTextChange(String s) {
-                populateAdapter(s);
+                populateSearchAdapter(s);
                 return false;
             }
         });
 
+        // Dirty work around to set background of search suggestions
         LinearLayout linearLayout1 = (LinearLayout) searchView.getChildAt(0);
         LinearLayout linearLayout2 = (LinearLayout) linearLayout1.getChildAt(2);
         LinearLayout linearLayout3 = (LinearLayout) linearLayout2.getChildAt(1);
@@ -406,9 +513,9 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
         autoComplete.setDropDownBackgroundResource(R.color.graph_transdarkblue);
     }
 
-    private void populateAdapter(String query) {
+    private void populateSearchAdapter(String query) {
         final MatrixCursor cursor = new MatrixCursor(new String[]{ BaseColumns._ID, "plz" });
-        suggestions = CSVParser.getPLZSuggestionForQuery(this, query);
+        suggestions = CSVParserForZipCodes.getZipCodeSuggestionForQuery(this, query);
         for (int i=0; i<suggestions.size(); i++) {
             cursor.addRow(new Object[] {i, suggestions.get(i)});
         }
@@ -444,15 +551,15 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
 
         dataHandler.setPlz(plz);
 
-        // Get name of PLZ region
-        String name = dataHandler.fetchPLZName();
+        // Get name of ZIPCODE_TITLE region
+        String name = dataHandler.fetchZipCodeName();
         if(name == null){
             Toast.makeText(this, res.getString(R.string.no_berlin_zipcode), Toast.LENGTH_LONG).show();
             finish();
             return;
         }
 
-        // UI Reaction on new PLZ
+        // UI Reaction on new ZIPCODE_TITLE
         getSupportActionBar().setTitle(plz + " " + name);
         twitterProgressBar.setVisibility(View.VISIBLE);
         yelpProgressBar.setVisibility(View.VISIBLE);
@@ -546,7 +653,7 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
                 }
             });
 
-            textView.setText(data.get(i) + " " + dataHandler.fetchPLZName(data.get(i)));
+            textView.setText(data.get(i) + " " + dataHandler.fetchZipCodeName(data.get(i)));
             layout.addView(textView);
         }
     }
@@ -681,6 +788,10 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
                 ageChart.setColumnChartData(data);
                 ageChart.setZoomEnabled(false);
                 break;
+            case Constants.AGE_HISTORY_CHART:
+                ageHistoryChart.setColumnChartData(data);
+                ageHistoryChart.setZoomEnabled(false);
+                break;
             case Constants.GENDER_CHART:
                 genderChart.setColumnChartData(data);
                 genderChart.setZoomEnabled(false);
@@ -697,9 +808,35 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
                 foreignersChart.setColumnChartData(data);
                 foreignersChart.setZoomEnabled(false);
                 break;
+            case Constants.FOREIGNERS_HISTORY_CHART:
+                foreignersHistoryChart.setColumnChartData(data);
+                foreignersHistoryChart.setZoomEnabled(false);
+                break;
         }
 
 
+    }
+
+    @Override
+    public void onLocationUpdate(Location loc) {
+        zipCodeOfUser = GeoProvider.plzFromLatLng(this, loc.getLatitude(), loc.getLongitude());
+        Log.d(TAG, "New Location: " + zipCodeOfUser);
+
+        if(zipCodeOfUser != null){
+
+            locationProvider.stopLocationUpdates();
+
+            if(zipCodeOfUser.equals(plz)){
+
+                isZipCodeOfUser = true;
+                ratePlzHeader.setVisibility(View.VISIBLE);
+
+            } else {
+
+                ratePlzHeader.setVisibility(View.GONE);
+
+            }
+        }
     }
 
     @Override

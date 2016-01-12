@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.database.MatrixCursor;
+import android.location.Location;
 import android.provider.BaseColumns;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.CursorAdapter;
@@ -21,7 +22,6 @@ import android.widget.AutoCompleteTextView;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
@@ -36,12 +36,13 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import de.beuth.bva.viciberlin.R;
-import de.beuth.bva.viciberlin.util.CSVParser;
+import de.beuth.bva.viciberlin.geo.GoogleLocationProvider;
+import de.beuth.bva.viciberlin.util.CSVParserForZipCodes;
 import de.beuth.bva.viciberlin.util.Constants;
 import de.beuth.bva.viciberlin.ui.util.CustomMapView;
 import de.beuth.bva.viciberlin.geo.GeoProvider;
 
-public class MainActivity extends AppCompatActivity implements CustomMapView.LocationPressListener {
+public class MainActivity extends AppCompatActivity implements CustomMapView.LocationPressListener, GoogleLocationProvider.LocationListener {
 
     private static final String TAG = "MainActivity";
     @Bind(R.id.map) CustomMapView mapView;
@@ -56,6 +57,10 @@ public class MainActivity extends AppCompatActivity implements CustomMapView.Loc
     List<String> suggestions;
     Resources res;
 
+    // Location
+    GoogleLocationProvider locationProvider;
+    String zipCodeOfUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,8 +68,25 @@ public class MainActivity extends AppCompatActivity implements CustomMapView.Loc
         ButterKnife.bind(this);
         res = getResources();
 
+        locationProvider = new GoogleLocationProvider(this, this);
+        locationProvider.setupGoogleApiClient();
+
         setupMap();
         setupNavigationDrawer();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(zipCodeOfUser == null){
+            locationProvider.setupGoogleApiClient();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        locationProvider.stopLocationUpdates();
     }
 
     @Override
@@ -78,7 +100,16 @@ public class MainActivity extends AppCompatActivity implements CustomMapView.Loc
     public boolean onOptionsItemSelected(MenuItem item)
     {
         if(item.getItemId() == R.id.location_item){
-            Log.i(TAG, "Location pressed");
+
+            if(zipCodeOfUser != null){
+                Intent intent = new Intent(getApplicationContext(), PLZActivity.class);
+                intent.setAction(Constants.PLZ_INTENT);
+                intent.putExtra(Constants.PLZ_EXTRA, zipCodeOfUser);
+                intent.putExtra(Constants.ZIPOFUSER_EXTRA, true);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Bitte aktivieren Sie Location Services und warten Sie einen Moment, damit Ihr Standort ermittelt werden kann.", Toast.LENGTH_LONG).show();
+            }
             return true;
         }
         if (drawerToggle.onOptionsItemSelected(item))
@@ -171,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements CustomMapView.Loc
 
     private void populateAdapter(String query) {
         final MatrixCursor cursor = new MatrixCursor(new String[]{ BaseColumns._ID, "plz" });
-        suggestions = CSVParser.getPLZSuggestionForQuery(this, query);
+        suggestions = CSVParserForZipCodes.getZipCodeSuggestionForQuery(this, query);
         for (int i=0; i<suggestions.size(); i++) {
             cursor.addRow(new Object[] {i, suggestions.get(i)});
         }
@@ -220,6 +251,16 @@ public class MainActivity extends AppCompatActivity implements CustomMapView.Loc
         intent.setAction(Constants.PLZ_INTENT);
         intent.putExtra(Constants.PLZ_EXTRA, plz);
         startActivity(intent);
+    }
+
+    @Override
+    public void onLocationUpdate(Location loc) {
+        zipCodeOfUser = GeoProvider.plzFromLatLng(this, loc.getLatitude(), loc.getLongitude());
+        Log.d(TAG, "New Location: " + zipCodeOfUser);
+
+        if(zipCodeOfUser != null){
+            locationProvider.stopLocationUpdates();
+        }
     }
 
 

@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import java.util.HashMap;
 
 import de.beuth.bva.viciberlin.R;
+import de.beuth.bva.viciberlin.util.Constants;
 
 /**
  * Created by betty on 10/11/15.
@@ -20,6 +21,7 @@ public class HideShowListener implements View.OnClickListener {
     public HideShowListener(Activity context){
         super();
         this.context = context;
+        viewMap.put(R.id.map_header, new Integer[]{R.id.map_relativelayout, R.id.map_arrow});
         viewMap.put(R.id.age_header, new Integer[]{R.id.age_linearlayout, R.id.age_arrow});
         viewMap.put(R.id.age_equal_header, new Integer[]{R.id.age_equal_linearlayout, R.id.age_equal_arrow});
         viewMap.put(R.id.gender_header, new Integer[]{R.id.gender_linearlayout, R.id.gender_arrow});
@@ -50,11 +52,24 @@ public class HideShowListener implements View.OnClickListener {
         if(arrowView != null){
 
             if(arrowView.getTag().equals("down")){
+
                 arrowView.setTag("up");
                 arrowView.setImageResource(R.drawable.android_arrow);
-            } else {
+
+            } else if(arrowView.getTag().equals("up")) {
+
                 arrowView.setTag("down");
                 arrowView.setImageResource(R.drawable.android_arrowup);
+
+            } else if(arrowView.getTag().equals("up_white")) {
+
+                arrowView.setTag("down_white");
+                arrowView.setImageResource(R.drawable.android_arrow_white);
+
+            } else if(arrowView.getTag().equals("down_white")) {
+
+                arrowView.setTag("up_white");
+                arrowView.setImageResource(R.drawable.android_arrowup_white);
             }
         }
     }
