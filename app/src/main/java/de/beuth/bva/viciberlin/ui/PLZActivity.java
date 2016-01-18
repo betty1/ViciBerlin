@@ -20,8 +20,11 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
@@ -68,56 +71,6 @@ import lecho.lib.hellocharts.view.ColumnChartView;
 
 public class PLZActivity extends AppCompatActivity implements RestCallback, OAuthTwitterCall.OAuthTwitterCallback, OAuthYelpCall.OAuthYelpCallback, DataHandler.DataReceiver, GoogleLocationProvider.LocationListener {
 
-    @Bind(R.id.map_header) LinearLayout mapHeader;
-    @Bind(R.id.mini_map) CustomMiniMapView miniMapView;
-
-    @Bind(R.id.age_header) LinearLayout ageHeader;
-    @Bind(R.id.age_chart) ColumnChartView ageChart;
-    @Bind(R.id.age_history_chart) ColumnChartView ageHistoryChart;
-    @Bind(R.id.age_equal_header) LinearLayout ageEqualHeader;
-    @Bind(R.id.age_equal_linearlayout) LinearLayout ageEqualLinearLayout;
-
-    @Bind(R.id.gender_header) LinearLayout genderHeader;
-    @Bind(R.id.gender_chart) ColumnChartView genderChart;
-
-    @Bind(R.id.location_header) LinearLayout locationHeader;
-    @Bind(R.id.location_chart) ColumnChartView locationChart;
-    @Bind(R.id.location_equal_header) LinearLayout locationEqualHeader;
-    @Bind(R.id.location_equal_linearlayout) LinearLayout locationEqualLinearLayout;
-
-    @Bind(R.id.duration_header) LinearLayout durationHeader;
-    @Bind(R.id.duration_chart) ColumnChartView durationChart;
-    @Bind(R.id.duration_equal_header) LinearLayout durationEqualHeader;
-    @Bind(R.id.duration_equal_linearlayout) LinearLayout durationEqualLinearLayout;
-
-    @Bind(R.id.foreigners_header) LinearLayout foreignersHeader;
-    @Bind(R.id.foreigners_chart) ColumnChartView foreignersChart;
-    @Bind(R.id.foreigners_history_chart) ColumnChartView foreignersHistoryChart;
-    @Bind(R.id.foreigners_equal_header) LinearLayout foreignersEqualHeader;
-    @Bind(R.id.foreigners_equal_linearlayout) LinearLayout foreignersEqualLinearLayout;
-
-    @Bind(R.id.twitter_flowlayout) FlowLayout twitterFlowLayout;
-    @Bind(R.id.restaurants_textview) TextView restaurantTextView;
-    @Bind(R.id.cafes_textview) TextView cafesTextView;
-    @Bind(R.id.nightlife_textview) TextView nightlifeTextView;
-
-    @Bind(R.id.twitter_progressbar) ProgressBar twitterProgressBar;
-    @Bind(R.id.yelp_progressbar) ProgressBar yelpProgressBar;
-
-    @Bind(R.id.rate_plz_header) LinearLayout ratePlzHeader;
-
-    @Bind(R.id.culture_ratingbar) ProperRatingBar cultureRatingBar;
-    @Bind(R.id.infrastructure_ratingbar) ProperRatingBar infrastructureRatingBar;
-    @Bind(R.id.green_ratingbar) ProperRatingBar greenRatingBar;
-    @Bind(R.id.safety_ratingbar) ProperRatingBar safetyRatingBar;
-
-    @Bind(R.id.zoom_in_button) Button zoomInButton;
-    @Bind(R.id.zoom_out_button) Button zoomOutButton;
-
-
-    PopupWindow ratingPopup;
-    View popUpLayout;
-
     final String TAG = "PLZActivity";
 
     final String GOOGLE_LATLONG_CALLID = "googleLatLongCall";
@@ -128,6 +81,73 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
     final String RATING_POST_CALLID = "ratingPostCall";
     final String RATING_GET_CALLID = "ratingGetCall";
 
+    // MAP
+    @Bind(R.id.map_header) LinearLayout mapHeader;
+    @Bind(R.id.mini_map) CustomMiniMapView miniMapView;
+
+    @Bind(R.id.zoom_in_button) Button zoomInButton;
+    @Bind(R.id.zoom_out_button) Button zoomOutButton;
+
+    // DEMOGRAPHY
+    @Bind(R.id.demography_header) LinearLayout demographyHeader;
+    @Bind(R.id.demography_info_icon) ImageView demographyInfoIcon;
+
+    @Bind(R.id.age_header) LinearLayout ageHeader;
+    @Bind(R.id.age_linearlayout) LinearLayout ageLayout;
+    @Bind(R.id.age_chart) ColumnChartView ageChart;
+    @Bind(R.id.age_history_chart) ColumnChartView ageHistoryChart;
+    @Bind(R.id.age_equal_header) LinearLayout ageEqualHeader;
+    @Bind(R.id.age_equal_linearlayout) LinearLayout ageEqualLinearLayout;
+
+    @Bind(R.id.gender_header) LinearLayout genderHeader;
+    @Bind(R.id.gender_linearlayout) LinearLayout genderLayout;
+    @Bind(R.id.gender_chart) ColumnChartView genderChart;
+
+    @Bind(R.id.location_header) LinearLayout locationHeader;
+    @Bind(R.id.location_linearlayout) LinearLayout locationLayout;
+    @Bind(R.id.location_chart) ColumnChartView locationChart;
+    @Bind(R.id.location_equal_header) LinearLayout locationEqualHeader;
+    @Bind(R.id.location_equal_linearlayout) LinearLayout locationEqualLinearLayout;
+
+    @Bind(R.id.duration_header) LinearLayout durationHeader;
+    @Bind(R.id.duration_linearlayout) LinearLayout durationLayout;
+    @Bind(R.id.duration_chart) ColumnChartView durationChart;
+    @Bind(R.id.duration_equal_header) LinearLayout durationEqualHeader;
+    @Bind(R.id.duration_equal_linearlayout) LinearLayout durationEqualLinearLayout;
+
+    @Bind(R.id.foreigners_header) LinearLayout foreignersHeader;
+    @Bind(R.id.foreigners_linearlayout) LinearLayout foreignersLayout;
+    @Bind(R.id.foreigners_chart) ColumnChartView foreignersChart;
+    @Bind(R.id.foreigners_history_chart) ColumnChartView foreignersHistoryChart;
+    @Bind(R.id.foreigners_equal_header) LinearLayout foreignersEqualHeader;
+    @Bind(R.id.foreigners_equal_linearlayout) LinearLayout foreignersEqualLinearLayout;
+
+    // RATING
+    @Bind(R.id.rate_this_bar) LinearLayout rateThisBar;
+    @Bind(R.id.rating_header) LinearLayout ratingHeader;
+    @Bind(R.id.culture_ratingbar) ProperRatingBar cultureRatingBar;
+    @Bind(R.id.infrastructure_ratingbar) ProperRatingBar infrastructureRatingBar;
+    @Bind(R.id.green_ratingbar) ProperRatingBar greenRatingBar;
+    @Bind(R.id.safety_ratingbar) ProperRatingBar safetyRatingBar;
+
+    // YELP
+    @Bind(R.id.yelp_header) LinearLayout yelpHeader;
+    @Bind(R.id.yelp_progressbar) ProgressBar yelpProgressBar;
+    @Bind(R.id.restaurants_textview) TextView restaurantTextView;
+    @Bind(R.id.cafes_textview) TextView cafesTextView;
+    @Bind(R.id.nightlife_textview) TextView nightlifeTextView;
+
+    // TWITTER
+    @Bind(R.id.twitter_header) LinearLayout twitterHeader;
+    @Bind(R.id.twitter_progressbar) ProgressBar twitterProgressBar;
+    @Bind(R.id.twitter_flowlayout) FlowLayout twitterFlowLayout;
+
+    PopupWindow ratingPopup;
+    View ratingPopUpLayout;
+
+    PopupWindow explainPopup;
+    View explainPopUpLayout;
+
     Resources res;
     DataHandler dataHandler;
     VolleyRestProvider restProvider;
@@ -136,17 +156,17 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
 
     HideShowListener hideShowListener;
 
-    private SimpleCursorAdapter searchAdapter;
-    private SearchView searchView;
+    SimpleCursorAdapter searchAdapter;
+    SearchView searchView;
     List<String> suggestions;
 
-    String plz = "";
-    String[] latLong = new String[2];
+    // LOCATION
+    private GoogleLocationProvider locationProvider;
+    private String zipCodeOfUser;
+    private boolean isZipCodeOfUser = false;
 
-    // Location
-    GoogleLocationProvider locationProvider;
-    String zipCodeOfUser;
-    boolean isZipCodeOfUser = false;
+    private String plz = "";
+    private String[] latLong = new String[2];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,6 +191,7 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
         }
 
         setupRatingPopup();
+        setupExplainPopup();
     }
 
     @Override
@@ -322,28 +343,55 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
 
     private void setupUIListener(){
         hideShowListener = new HideShowListener(this);
-        mapHeader.setOnClickListener(hideShowListener);
-        ageHeader.setOnClickListener(hideShowListener);
-        ageEqualHeader.setOnClickListener(hideShowListener);
-        genderHeader.setOnClickListener(hideShowListener);
-        locationHeader.setOnClickListener(hideShowListener);
-        locationEqualHeader.setOnClickListener(hideShowListener);
-        durationHeader.setOnClickListener(hideShowListener);
-        durationEqualHeader.setOnClickListener(hideShowListener);
-        foreignersHeader.setOnClickListener(hideShowListener);
-        foreignersEqualHeader.setOnClickListener(hideShowListener);
+
+        ViewGroup[] hideShowHeaders = {mapHeader, demographyHeader, ageHeader, ageEqualHeader,
+                genderHeader, locationHeader, locationEqualHeader, durationHeader, durationEqualHeader,
+                foreignersHeader, foreignersEqualHeader, ratingHeader, yelpHeader, twitterHeader};
+
+        for(ViewGroup view: hideShowHeaders){
+            view.setOnClickListener(hideShowListener);
+        }
+
+            // Info popups
+        demographyInfoIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                explainPopup.showAtLocation(ratingPopUpLayout, Gravity.CENTER, 10, 10);
+            }
+        });
+    }
+
+    private void setupExplainPopup() {
+
+        // Create popup with buttons
+        explainPopUpLayout = getLayoutInflater().inflate(R.layout.popup_explain, null); // inflating popup layout
+        explainPopup = new PopupWindow(explainPopUpLayout, LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT, true); // creation of popup
+        Button closeButton = (Button) explainPopUpLayout.findViewById(R.id.close_button);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                explainPopup.dismiss();
+            }
+        });
+
+        // Setup Webview
+        WebView webView = (WebView) explainPopUpLayout.findViewById(R.id.explain_webview);
+        webView.loadUrl("http://vici-berlin.herokuapp.com/explain/demography");
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setDomStorageEnabled(true);
     }
 
     private void setupRatingPopup(){
 
         // Create popup with buttons
-        popUpLayout = getLayoutInflater().inflate(R.layout.popup_rating, null); // inflating popup layout
-        ratingPopup = new PopupWindow(popUpLayout, LinearLayout.LayoutParams.MATCH_PARENT,
+        ratingPopUpLayout = getLayoutInflater().inflate(R.layout.popup_rating, null); // inflating popup layout
+        ratingPopup = new PopupWindow(ratingPopUpLayout, LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT, true); // creation of popup
 
         // Set Button ClickListeners
-        Button cancelRatingButton = (Button) popUpLayout.findViewById(R.id.cancel_rating_button);
-        Button saveRatingButton = (Button) popUpLayout.findViewById(R.id.save_rating_button);
+        Button cancelRatingButton = (Button) ratingPopUpLayout.findViewById(R.id.cancel_rating_button);
+        Button saveRatingButton = (Button) ratingPopUpLayout.findViewById(R.id.save_rating_button);
         cancelRatingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -355,28 +403,27 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
             public void onClick(View v) {
                 restProvider.makePOSTRequest(Constants.RATING_URL, RATING_POST_CALLID, getRatingParams());
                 ratingPopup.dismiss();
-                ratePlzHeader.setVisibility(View.GONE);
+                rateThisBar.setVisibility(View.GONE);
             }
         });
 
         // Show Rate Header and add onClickListener to open popup
-        ratePlzHeader.setOnClickListener(new View.OnClickListener() {
+        rateThisBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if(UserLoginControl.isLoggedIn(v.getContext())) {
-                    ratingPopup.showAtLocation(popUpLayout, Gravity.CENTER, 10, 10);
-                }
-                else {
-                // Send to login screen if not logged in
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivity(intent);
+                if (UserLoginControl.isLoggedIn(v.getContext())) {
+                    ratingPopup.showAtLocation(ratingPopUpLayout, Gravity.CENTER, 10, 10);
+                } else {
+                    // Send to login screen if not logged in
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    startActivity(intent);
                 }
             }
         });
 
         if(isZipCodeOfUser){
-            ratePlzHeader.setVisibility(View.VISIBLE);
+            rateThisBar.setVisibility(View.VISIBLE);
         }
     }
 
@@ -393,10 +440,10 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
         params.put("user_id", String.valueOf(userId));
 
         // Fetch rating values
-        ProperRatingBar cultureRating = (ProperRatingBar) popUpLayout.findViewById(R.id.culture_ratingbar);
-        ProperRatingBar infraRating = (ProperRatingBar) popUpLayout.findViewById(R.id.infrastructure_ratingbar);
-        ProperRatingBar greenRating = (ProperRatingBar) popUpLayout.findViewById(R.id.green_ratingbar);
-        ProperRatingBar safetyRating = (ProperRatingBar) popUpLayout.findViewById(R.id.safety_ratingbar);
+        ProperRatingBar cultureRating = (ProperRatingBar) ratingPopUpLayout.findViewById(R.id.culture_ratingbar);
+        ProperRatingBar infraRating = (ProperRatingBar) ratingPopUpLayout.findViewById(R.id.infrastructure_ratingbar);
+        ProperRatingBar greenRating = (ProperRatingBar) ratingPopUpLayout.findViewById(R.id.green_ratingbar);
+        ProperRatingBar safetyRating = (ProperRatingBar) ratingPopUpLayout.findViewById(R.id.safety_ratingbar);
 
         int culture = cultureRating.getRating();
         int infrastructure = infraRating.getRating();
@@ -523,6 +570,14 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
     }
 
     private void preOpenViews(String chartType){
+        // Standard pre open views
+        hideShowListener.onClick(mapHeader);
+        hideShowListener.onClick(demographyHeader);
+        hideShowListener.onClick(ratingHeader);
+        hideShowListener.onClick(yelpHeader);
+        hideShowListener.onClick(twitterHeader);
+
+        // custom preopen views
         LinearLayout layout;
 
         switch(chartType) {
@@ -829,11 +884,11 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
             if(zipCodeOfUser.equals(plz)){
 
                 isZipCodeOfUser = true;
-                ratePlzHeader.setVisibility(View.VISIBLE);
+                rateThisBar.setVisibility(View.VISIBLE);
 
             } else {
 
-                ratePlzHeader.setVisibility(View.GONE);
+                rateThisBar.setVisibility(View.GONE);
 
             }
         }

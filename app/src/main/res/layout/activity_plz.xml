@@ -9,9 +9,9 @@
     android:background="@android:color/white"
     android:animateLayoutChanges="true" >
 
-    <!--RATING HEADER-->
+    <!--RATE THIS BAR-->
     <LinearLayout
-        android:id="@+id/rate_plz_header"
+        android:id="@+id/rate_this_bar"
         style="?primaryBar"
         android:background="@android:color/holo_red_dark"
         android:tag="sticky"
@@ -22,16 +22,17 @@
             android:text="@string/rate_this" />
 
     </LinearLayout>
-    <!--RATING HEADER END-->
+    <!--RATE THIS BAR END-->
 
     <!--SCROLL VIEW-->
     <com.emilsjolander.components.StickyScrollViewItems.StickyScrollView
         android:id="@+id/sticky_scroll"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:animateLayoutChanges="true">
+        android:animateLayoutChanges="true" >
 
         <LinearLayout
+            android:id="@+id/main_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -39,9 +40,9 @@
 
             <!--MAP HEADER-->
             <LinearLayout
+                android:id="@+id/map_header"
                 style="?primaryBar"
-                android:tag="sticky"
-                android:id="@+id/map_header" >
+                android:tag="sticky" >
 
                 <ImageView
                     android:id="@+id/map_arrow"
@@ -49,17 +50,18 @@
                     android:tag="up_white" />
 
                 <TextView
-                    style="?primaryBarText"
-                    android:text="@string/mapview" />
+                    android:text="@string/mapview"
+                    style="?primaryBarText"  />
 
             </LinearLayout>
             <!--MAP HEADER END-->
 
             <!--MAP-->
             <RelativeLayout
+                android:id="@+id/map_relativelayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/map_relativelayout">
+                android:visibility="gone" >
 
             <de.beuth.bva.viciberlin.ui.util.CustomMiniMapView
                 android:id="@+id/mini_map"
@@ -97,9 +99,11 @@
 
             <!--DEMOGRAPHY HEADER-->
             <LinearLayout
+                android:id="@+id/demography_header"
                 android:orientation="horizontal"
                 style="?primaryBar"
-                android:tag="sticky" >
+                android:tag="sticky"
+                android:weightSum="8">
 
                 <ImageView
                     android:id="@+id/demography_arrow"
@@ -108,273 +112,290 @@
                 <TextView
                     style="?primaryBarText"
                     android:text="@string/demography" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="7" />
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/demography_info_icon"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_info_outline_white_36dp" />
             </LinearLayout>
             <!--DEMOGRAPHY HEADER END-->
 
-            <!--AGE HEADER-->
-            <LinearLayout
-                style="?secondaryBar"
-                android:id="@+id/age_header">
+            <!--DEMOGRAPHY-->
+
+                <!--AGE HEADER-->
+                <LinearLayout
+                    style="?secondaryBar"
+                    android:id="@+id/age_header" >
 
                 <ImageView
-                    android:id="@+id/age_arrow"
-                    style="@style/ArrowMedium" />
-
-                <TextView
-                    style="@style/BarText"
-                    android:text="@string/age" />
-
-            </LinearLayout>
-            <!--AGE HEADER END-->
-
-            <!--AGE-->
-            <LinearLayout
-                android:id="@+id/age_linearlayout"
-                style="@style/SubLayout"
-                android:animateLayoutChanges="true" >
-
-                <lecho.lib.hellocharts.view.ColumnChartView
-                    android:id="@+id/age_chart"
-                    style="@style/ColumnChart" />
-
-                <lecho.lib.hellocharts.view.ColumnChartView
-                    android:id="@+id/age_history_chart"
-                    style="@style/ColumnChart" />
-
-                <TextView
-                    android:text="@string/key_average"
-                    style="@style/KeyTextView" />
-
-                <!--EQUAL HEADER-->
-                <LinearLayout
-                    android:id="@+id/age_equal_header"
-                    style="@style/EqualHeader" >
-
-                    <ImageView
-                        android:id="@+id/age_equal_arrow"
-                        style="@style/ArrowSmall" />
+                        android:id="@+id/age_arrow"
+                        style="@style/ArrowMedium" />
 
                     <TextView
-                        android:text="@string/equal_age"
-                        style="@style/EqualHeaderText" />
+                        style="@style/BarText"
+                        android:text="@string/age" />
 
                 </LinearLayout>
-                <!--EQUAL HEADER END-->
+                <!--AGE HEADER END-->
 
-                <!--EQUAL-->
+                <!--AGE-->
                 <LinearLayout
-                    android:id="@+id/age_equal_linearlayout"
-                    style="@style/EqualLayout" />
-                <!-- EQUAL END-->
+                    android:id="@+id/age_linearlayout"
+                    style="@style/SubLayout" >
 
-            </LinearLayout>
-            <!-- AGE END-->
+                    <lecho.lib.hellocharts.view.ColumnChartView
+                        android:id="@+id/age_chart"
+                        style="@style/ColumnChart" />
 
-            <!--GENDER HEADER-->
-            <LinearLayout
-                android:id="@+id/gender_header"
-                style="?secondaryBar" >
-
-                <ImageView
-                    android:id="@+id/gender_arrow"
-                    style="@style/ArrowMedium" />
-
-                <TextView
-                    android:text="@string/gender"
-                    style="@style/BarText"
-                    />
-            </LinearLayout>
-            <!--GENDER HEADER END-->
-
-            <!--GENDER-->
-            <LinearLayout
-                android:id="@+id/gender_linearlayout"
-                style="@style/SubLayout"
-                android:animateLayoutChanges="true" >
-
-                <lecho.lib.hellocharts.view.ColumnChartView
-                    android:id="@+id/gender_chart"
-                    style="@style/ColumnChart" />
-
-                <TextView
-                    android:text="@string/key_average"
-                    style="@style/KeyTextView" />
-
-            </LinearLayout>
-            <!--GENDER END-->
-
-            <!--LOCATION HEADER-->
-            <LinearLayout
-                android:id="@+id/location_header"
-                style="?secondaryBar" >
-
-                <ImageView
-                    android:id="@+id/location_arrow"
-                    style="@style/ArrowMedium" />
-
-                <TextView
-                    android:text="@string/location"
-                    style="@style/BarText" />
-
-            </LinearLayout>
-            <!--LOCATION HEADER END-->
-
-            <!--LOCATION-->
-            <LinearLayout
-                android:id="@+id/location_linearlayout"
-                style="@style/SubLayout"
-                android:animateLayoutChanges="true" >
-
-                <lecho.lib.hellocharts.view.ColumnChartView
-                    android:id="@+id/location_chart"
-                    style="@style/ColumnChart" />
-
-                <TextView
-                    android:text="@string/key_average"
-                    style="@style/KeyTextView" />
-
-                <!--EQUAL HEADER-->
-                <LinearLayout
-                    android:id="@+id/location_equal_header"
-                    style="@style/EqualHeader" >
-
-                    <ImageView
-                        android:id="@+id/location_equal_arrow"
-                        style="@style/ArrowSmall" />
+                    <lecho.lib.hellocharts.view.ColumnChartView
+                        android:id="@+id/age_history_chart"
+                        style="@style/ColumnChart"
+                        android:visibility="gone" />
 
                     <TextView
-                        android:text="@string/equal_location"
-                        style="@style/EqualHeaderText" />
+                        android:text="@string/key_average"
+                        style="@style/KeyTextView" />
+
+                    <!--EQUAL HEADER-->
+                    <LinearLayout
+                        android:id="@+id/age_equal_header"
+                        style="@style/EqualHeader" >
+
+                        <ImageView
+                            android:id="@+id/age_equal_arrow"
+                            style="@style/ArrowSmall" />
+
+                        <TextView
+                            android:text="@string/equal_age"
+                            style="@style/EqualHeaderText" />
+
+                    </LinearLayout>
+                    <!--EQUAL HEADER END-->
+
+                    <!--EQUAL-->
+                    <LinearLayout
+                        android:id="@+id/age_equal_linearlayout"
+                        style="@style/EqualLayout" />
+                    <!-- EQUAL END-->
 
                 </LinearLayout>
-                <!--EQUAL HEADER END-->
+                <!-- AGE END-->
 
-                <!--EQUAL-->
+                <!--GENDER HEADER-->
                 <LinearLayout
-                    android:id="@+id/location_equal_linearlayout"
-                    style="@style/EqualLayout" />
-            </LinearLayout>
-            <!--LOCATION END-->
-
-            <!--DURATION HEADER-->
-            <LinearLayout
-                android:id="@+id/duration_header"
-                style="?secondaryBar" >
+                    android:id="@+id/gender_header"
+                    style="?secondaryBar" >
 
                 <ImageView
-                    android:id="@+id/duration_arrow"
-                    style="@style/ArrowMedium" />
-
-                <TextView
-                    android:text="@string/duration"
-                    style="@style/BarText" />
-
-            </LinearLayout>
-            <!--DURATION HEADER END-->
-
-            <!--DURATION-->
-            <LinearLayout
-                android:id="@+id/duration_linearlayout"
-                style="@style/SubLayout"
-                android:animateLayoutChanges="true" >
-
-                <lecho.lib.hellocharts.view.ColumnChartView
-                    android:id="@+id/duration_chart"
-                    style="@style/ColumnChart" />
-
-                <TextView
-                    android:text="@string/key_average"
-                    style="@style/KeyTextView" />
-
-                <!--EQUAL HEADER-->
-                <LinearLayout
-                    android:id="@+id/duration_equal_header"
-                    style="@style/EqualHeader" >
-
-                    <ImageView
-                        android:id="@+id/duration_equal_arrow"
-                        style="@style/ArrowSmall" />
+                        android:id="@+id/gender_arrow"
+                        style="@style/ArrowMedium" />
 
                     <TextView
-                        android:text="@string/equal_duration"
-                        style="@style/EqualHeaderText" />
+                        android:text="@string/gender"
+                        style="@style/BarText"
+                        />
+                </LinearLayout>
+                <!--GENDER HEADER END-->
+
+                <!--GENDER-->
+                <LinearLayout
+                    android:id="@+id/gender_linearlayout"
+                    style="@style/SubLayout" >
+
+                    <lecho.lib.hellocharts.view.ColumnChartView
+                        android:id="@+id/gender_chart"
+                        style="@style/ColumnChart" />
+
+                    <TextView
+                        android:text="@string/key_average"
+                        style="@style/KeyTextView" />
 
                 </LinearLayout>
-                <!--EQUAL HEADER END-->
+                <!--GENDER END-->
 
-                <!--EQUAL-->
+                <!--LOCATION HEADER-->
                 <LinearLayout
-                    android:id="@+id/duration_equal_linearlayout"
-                    style="@style/EqualLayout" />
-                <!-- EQUAL END-->
-
-            </LinearLayout>
-            <!--DURATION END-->
-
-            <!--FOREIGNERS HEADER-->
-            <LinearLayout
-                android:id="@+id/foreigners_header"
-                style="?secondaryBar" >
+                    android:id="@+id/location_header"
+                    style="?secondaryBar" >
 
                 <ImageView
-                    android:id="@+id/foreigners_arrow"
-                    style="@style/ArrowMedium" />
-
-                <TextView
-                    android:text="@string/foreigners"
-                    style="@style/BarText" />
-            </LinearLayout>
-            <!--FOREIGNERS HEADER END-->
-
-            <!--FOREIGNERS-->
-            <LinearLayout
-                android:id="@+id/foreigners_linearlayout"
-                style="@style/SubLayout"
-                android:animateLayoutChanges="true" >
-
-                <lecho.lib.hellocharts.view.ColumnChartView
-                    android:id="@+id/foreigners_chart"
-                    style="@style/ColumnChart"
-                    />
-
-                <lecho.lib.hellocharts.view.ColumnChartView
-                    android:id="@+id/foreigners_history_chart"
-                    style="@style/ColumnChart"
-                    />
-
-                <TextView
-                    android:text="@string/key_average"
-                    style="@style/KeyTextView" />
-
-                <!--EQUAL HEADER-->
-                <LinearLayout
-                    android:id="@+id/foreigners_equal_header"
-                    style="@style/EqualHeader" >
-
-                    <ImageView
-                        android:id="@+id/foreigners_equal_arrow"
-                        style="@style/ArrowSmall" />
+                        android:id="@+id/location_arrow"
+                        style="@style/ArrowMedium" />
 
                     <TextView
-                        android:text="@string/equal_foreigners"
-                        style="@style/EqualHeaderText" />
+                        android:text="@string/location"
+                        style="@style/BarText" />
 
                 </LinearLayout>
-                <!--EQUAL HEADER END-->
+                <!--LOCATION HEADER END-->
 
-                <!--EQUAL-->
+                <!--LOCATION-->
                 <LinearLayout
-                    android:id="@+id/foreigners_equal_linearlayout"
-                    style="@style/EqualLayout" />
+                    android:id="@+id/location_linearlayout"
+                    style="@style/SubLayout" >
 
-            </LinearLayout>
-            <!--FOREIGNERS END-->
+                    <lecho.lib.hellocharts.view.ColumnChartView
+                        android:id="@+id/location_chart"
+                        style="@style/ColumnChart" />
+
+                    <TextView
+                        android:text="@string/key_average"
+                        style="@style/KeyTextView" />
+
+                    <!--EQUAL HEADER-->
+                    <LinearLayout
+                        android:id="@+id/location_equal_header"
+                        style="@style/EqualHeader" >
+
+                        <ImageView
+                            android:id="@+id/location_equal_arrow"
+                            style="@style/ArrowSmall" />
+
+                        <TextView
+                            android:text="@string/equal_location"
+                            style="@style/EqualHeaderText" />
+
+                    </LinearLayout>
+                    <!--EQUAL HEADER END-->
+
+                    <!--EQUAL-->
+                    <LinearLayout
+                        android:id="@+id/location_equal_linearlayout"
+                        style="@style/EqualLayout" />
+                </LinearLayout>
+                <!--LOCATION END-->
+
+                <!--DURATION HEADER-->
+                <LinearLayout
+                    android:id="@+id/duration_header"
+                    style="?secondaryBar" >
+
+                    <ImageView
+                        android:id="@+id/duration_arrow"
+                        style="@style/ArrowMedium" />
+
+                    <TextView
+                        android:text="@string/duration"
+                        style="@style/BarText" />
+
+                </LinearLayout>
+                <!--DURATION HEADER END-->
+
+                <!--DURATION-->
+                <LinearLayout
+                    android:id="@+id/duration_linearlayout"
+                    style="@style/SubLayout" >
+
+                    <lecho.lib.hellocharts.view.ColumnChartView
+                        android:id="@+id/duration_chart"
+                        style="@style/ColumnChart" />
+
+                    <TextView
+                        android:text="@string/key_average"
+                        style="@style/KeyTextView" />
+
+                    <!--EQUAL HEADER-->
+                    <LinearLayout
+                        android:id="@+id/duration_equal_header"
+                        style="@style/EqualHeader" >
+
+                        <ImageView
+                            android:id="@+id/duration_equal_arrow"
+                            style="@style/ArrowSmall" />
+
+                        <TextView
+                            android:text="@string/equal_duration"
+                            style="@style/EqualHeaderText" />
+
+                    </LinearLayout>
+                    <!--EQUAL HEADER END-->
+
+                    <!--EQUAL-->
+                    <LinearLayout
+                        android:id="@+id/duration_equal_linearlayout"
+                        style="@style/EqualLayout" />
+                    <!-- EQUAL END-->
+
+                </LinearLayout>
+                <!--DURATION END-->
+
+                <!--FOREIGNERS HEADER-->
+                <LinearLayout
+                    android:id="@+id/foreigners_header"
+                    style="?secondaryBar" >
+
+                    <ImageView
+                        android:id="@+id/foreigners_arrow"
+                        style="@style/ArrowMedium" />
+
+                    <TextView
+                        android:text="@string/foreigners"
+                        style="@style/BarText" />
+                </LinearLayout>
+                <!--FOREIGNERS HEADER END-->
+
+                <!--FOREIGNERS-->
+                <LinearLayout
+                    android:id="@+id/foreigners_linearlayout"
+                    style="@style/SubLayout" >
+
+                    <lecho.lib.hellocharts.view.ColumnChartView
+                        android:id="@+id/foreigners_chart"
+                        style="@style/ColumnChart"
+                        />
+
+                    <lecho.lib.hellocharts.view.ColumnChartView
+                        android:id="@+id/foreigners_history_chart"
+                        style="@style/ColumnChart"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:text="@string/key_average"
+                        style="@style/KeyTextView" />
+
+                    <!--EQUAL HEADER-->
+                    <LinearLayout
+                        android:id="@+id/foreigners_equal_header"
+                        style="@style/EqualHeader" >
+
+                        <ImageView
+                            android:id="@+id/foreigners_equal_arrow"
+                            style="@style/ArrowSmall" />
+
+                        <TextView
+                            android:text="@string/equal_foreigners"
+                            style="@style/EqualHeaderText" />
+
+                    </LinearLayout>
+                    <!--EQUAL HEADER END-->
+
+                    <!--EQUAL-->
+                    <LinearLayout
+                        android:id="@+id/foreigners_equal_linearlayout"
+                        style="@style/EqualLayout" />
+                    <!-- EQUAL END-->
+
+                </LinearLayout>
+                <!--FOREIGNERS END-->
+
+            <!--DEMOGRAPHY END-->
 
             <!--RATING HEADER-->
             <LinearLayout
-                android:id="@+id/userrating_header"
+                android:id="@+id/rating_header"
                 style="?primaryBar"
                 android:tag="sticky" >
+
+                <ImageView
+                    android:id="@+id/rating_arrow"
+                    style="@style/ArrowBig" />
 
                 <TextView
                     android:text="@string/userratings"
@@ -394,15 +415,16 @@
 
             <!--RATING-->
             <LinearLayout
-                android:id="@+id/userrating_linearlayout"
+                android:id="@+id/rating_linearlayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
-                android:background="@android:color/white" >
+                android:background="@android:color/white"
+                android:visibility="gone" >
 
-                <!--CULTURE-->
+            <!--CULTURE-->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -531,6 +553,10 @@
                 style="?primaryBar"
                 android:tag="sticky" >
 
+                <ImageView
+                    android:id="@+id/yelp_arrow"
+                    style="@style/ArrowBig" />
+
                 <TextView
                     android:text="@string/yelp"
                     style="?primaryBarText" />
@@ -553,11 +579,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:background="@android:color/white" >
+                android:background="@android:color/white"
+                android:visibility="gone" >
 
-                <!--RESTAURANTS-->
+            <!--RESTAURANTS-->
                 <LinearLayout
-                    style="?secondaryBar" >
+                    style="?secondaryBar"
+                    android:visibility="visible" >
 
                     <TextView
                         android:text="@string/restaurants"
@@ -588,7 +616,8 @@
 
                 <!--CAFES-->
                 <LinearLayout
-                    style="?secondaryBar" >
+                    style="?secondaryBar"
+                    android:visibility="visible" >
 
                     <TextView
                         android:text="@string/cafes"
@@ -619,7 +648,8 @@
 
                 <!--NIGHTLIFE-->
                 <LinearLayout
-                    style="?secondaryBar" >
+                    style="?secondaryBar"
+                    android:visibility="visible" >
 
                     <TextView
                         android:text="@string/nightlife"
@@ -657,6 +687,10 @@
                 style="?primaryBar"
                 android:tag="sticky" >
 
+                <ImageView
+                    android:id="@+id/twitter_arrow"
+                    style="@style/ArrowBig" />
+
                 <TextView
                     android:text="@string/twitter"
                     style="?primaryBarText" />
@@ -676,10 +710,7 @@
             <!--TWITTER-->
             <org.apmem.tools.layouts.FlowLayout
                 android:id="@+id/twitter_flowlayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@android:color/white" >
+                style="@style/TwitterFlowLayout" >
             </org.apmem.tools.layouts.FlowLayout>
             <!--TWITTER END-->
 

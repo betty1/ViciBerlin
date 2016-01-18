@@ -39,6 +39,7 @@ public class DataHandler {
 
     public void fillCharts(){
 
+        // AGE CHART
         ZipCodeResult age = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.AGE_FILE, plz);
         float[] ageValues = age.getValues();
         List<String> ageMostEquals = age.getMostEquals();
@@ -48,16 +49,18 @@ public class DataHandler {
         ChartAttributes ageAttrs = new ChartAttributes(ageValues, ageAverages, ageLabels, res.getString(R.string.years), res.getString(R.string.percent));
         receiver.dataToChart(ageAttrs, Constants.AGE_CHART, new int[]{DataReceiver.GREEN, DataReceiver.PURPLE, DataReceiver.GREEN, DataReceiver.PURPLE, DataReceiver.GREEN});
         receiver.dataToViews(ageMostEquals, Constants.AGE_CHART);
+        // AGE CHART END
 
-//        HISTORY CHART
+        // AGE HISTORY CHART
         ZipCodeResult ageHistory = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.AGE_HISTORY_FILE, plz);
         float[] ageHistoryValues = ageHistory.getValues();
 
         float[] ageHistoryAverages = CSVParserForZipCodes.fetchAverageResult(context, Constants.AGE_HISTORY_FILE);
         ChartAttributes ageHistoryAttrs = new ChartAttributes(ageHistoryValues, ageHistoryAverages, ageLabels, res.getString(R.string.years), res.getString(R.string.percent));
         receiver.dataToChart(ageHistoryAttrs, Constants.AGE_HISTORY_CHART, new int[]{DataReceiver.GREEN, DataReceiver.PURPLE, DataReceiver.GREEN, DataReceiver.PURPLE, DataReceiver.GREEN});
-//        ***
+        // AGE HISTORY CHART END
 
+        // GENDER CHART
         ZipCodeResult gender = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.GENDER_FILE, plz);
         float[] genderValues = gender.getValues();
 //        List<String> genderMostEquals = gender.getMostEquals();
@@ -66,7 +69,9 @@ public class DataHandler {
         String[] genderLabels = new String[]{res.getString(R.string.male), res.getString(R.string.female)};
         ChartAttributes genderAttrs = new ChartAttributes(genderValues, genderAverages, genderLabels, "", res.getString(R.string.percent));
         receiver.dataToChart(genderAttrs, Constants.GENDER_CHART, new int[]{DataReceiver.DARKBLUE, DataReceiver.BLUE});
+        // GENDER CHART END
 
+        // LOCATION CHART
         ZipCodeResult location = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.LOCATION_FILE, plz, 1);
         float[] locationValues = location.getValues();
         List<String> locationMostEquals = location.getMostEquals();
@@ -76,7 +81,9 @@ public class DataHandler {
         ChartAttributes locationAttrs = new ChartAttributes(locationValues, locationAverages, locationLabels, "", res.getString(R.string.percent));
         receiver.dataToChart(locationAttrs, Constants.LOCATION_CHART, null);
         receiver.dataToViews(locationMostEquals, Constants.LOCATION_CHART);
+        // LOCATION CHART END
 
+        // DURATION CHART
         ZipCodeResult duration = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.DURATION_FILE, plz);
         float[] durationValues = duration.getValues();
         List<String> durationMostEquals = duration.getMostEquals();
@@ -86,7 +93,9 @@ public class DataHandler {
         ChartAttributes durationAttrs = new ChartAttributes(durationValues, durationAverages, durationLabels, "", res.getString(R.string.percent));
         receiver.dataToChart(durationAttrs, Constants.DURATION_CHART, null);
         receiver.dataToViews(durationMostEquals, Constants.DURATION_CHART);
+        // DURATION CHART END
 
+        // FOREIGNERS CHART
         ZipCodeResult foreigners = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.FOREIGNERS_FILE, plz);
         float[] foreignersValues = foreigners.getValues();
         List<String> foreignersMostEquals = foreigners.getMostEquals();
@@ -96,13 +105,16 @@ public class DataHandler {
         ChartAttributes foreignersAttrs = new ChartAttributes(foreignersValues, foreignersAverages, foreignersLabels, "", res.getString(R.string.percent));
         receiver.dataToChart(foreignersAttrs, Constants.FOREIGNERS_CHART, null);
         receiver.dataToViews(foreignersMostEquals, Constants.FOREIGNERS_CHART);
+        // FOREIGNERS CHART END
 
+        // FOREIGNERS HISTORY CHART
         ZipCodeResult foreignersHistory = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.FOREIGNERS_HISTORY_FILE, plz);
         float[] foreignersHistoryValues = foreignersHistory.getValues();
 
         float[] foreignersHistoryAverages = CSVParserForZipCodes.fetchAverageResult(context, Constants.FOREIGNERS_HISTORY_FILE);
         ChartAttributes foreignersHistoryAttrs = new ChartAttributes(foreignersHistoryValues, foreignersHistoryAverages, foreignersLabels, "", res.getString(R.string.percent));
         receiver.dataToChart(foreignersHistoryAttrs, Constants.FOREIGNERS_HISTORY_CHART, null);
+        // FOREIGNERS HISTORY CHART END
 
 //        area = CSVParserForZipCodes.getFloatValuesForZipCode(context, "area.csv", plz)[0];
     }

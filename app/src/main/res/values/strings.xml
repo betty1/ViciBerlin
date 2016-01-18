@@ -30,6 +30,8 @@
     <string name="userratings">Userbewertungen</string>
     <string name="rate_this">Bewerte diesen Kiez</string>
 
+    <string name="demography_popup_title">Demographische Daten</string>
+
     <!--Equal Regions-->
     <string name="equal_age">Ähnliche Bezirke (Altersverteilung)</string>
     <string name="equal_gender">Ähnliche Bezirke (Geschlechterverteilung)</string>
@@ -76,9 +78,11 @@
     <!--Buttons-->
     <string name="cancel">Abbrechen</string>
     <string name="save">Speichern</string>
+    <string name="close">Schließen</string>
 
     <!--Tags-->
     <string name="plz_tag">plzTag</string>
     <string name="charttype_tag">chartTypeTag</string>
+
 
 </resources>
