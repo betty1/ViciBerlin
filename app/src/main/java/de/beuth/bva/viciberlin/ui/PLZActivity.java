@@ -50,6 +50,7 @@ import de.beuth.bva.viciberlin.R;
 import de.beuth.bva.viciberlin.geo.GeoProvider;
 import de.beuth.bva.viciberlin.geo.GoogleLocationProvider;
 import de.beuth.bva.viciberlin.model.ChartAttributes;
+import de.beuth.bva.viciberlin.model.ComparableZipcode;
 import de.beuth.bva.viciberlin.rest.OAuthTwitterCall;
 import de.beuth.bva.viciberlin.rest.OAuthYelpCall;
 import de.beuth.bva.viciberlin.rest.RestCallback;
@@ -121,6 +122,11 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
     @Bind(R.id.foreigners_history_chart) ColumnChartView foreignersHistoryChart;
     @Bind(R.id.foreigners_equal_header) LinearLayout foreignersEqualHeader;
     @Bind(R.id.foreigners_equal_linearlayout) LinearLayout foreignersEqualLinearLayout;
+
+    @Bind(R.id.compare_header) LinearLayout compareHeader;
+    @Bind(R.id.compare_linearlayout) LinearLayout compareLayout;
+    @Bind(R.id.most_equal_linearlayout) LinearLayout mostEqualLayout;
+    @Bind(R.id.less_equal_linearlayout) LinearLayout lessEqualLayout;
 
     // RATING
     @Bind(R.id.rate_this_bar) LinearLayout rateThisBar;
@@ -346,7 +352,7 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
 
         ViewGroup[] hideShowHeaders = {mapHeader, demographyHeader, ageHeader, ageEqualHeader,
                 genderHeader, locationHeader, locationEqualHeader, durationHeader, durationEqualHeader,
-                foreignersHeader, foreignersEqualHeader, ratingHeader, yelpHeader, twitterHeader};
+                foreignersHeader, foreignersEqualHeader, compareHeader, ratingHeader, yelpHeader, twitterHeader};
 
         for(ViewGroup view: hideShowHeaders){
             view.setOnClickListener(hideShowListener);
@@ -662,7 +668,7 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
         }
     }
 
-    private void createEqualRegionViews(List<String> data, String chartType){
+    private void createEqualRegionViews(List<ComparableZipcode> data, String chartType){
         LinearLayout layout;
 
         switch(chartType) {
@@ -678,6 +684,18 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
             case Constants.FOREIGNERS_CHART:
                 layout = foreignersEqualLinearLayout;
                 break;
+            case Constants.MOST_EQUAL_CHART:
+                layout = mostEqualLayout;
+                for(ComparableZipcode zipcode: data){
+                    Log.d(TAG, zipcode.toString());
+                }
+                break;
+            case Constants.LESS_EQUAL_CHART:
+                layout = lessEqualLayout;
+                for(ComparableZipcode zipcode: data){
+                    Log.d(TAG, zipcode.toString());
+                }
+                break;
             default:
                 return;
         }
@@ -686,6 +704,7 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
 
         for(int i=0; i<data.size(); i++){
             TextView textView = new TextView(this);
+            String zipcode = data.get(i).getName();
 
             int margin = (int) getResources().getDimension(R.dimen.subitem_margin);
 
@@ -694,7 +713,7 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
             textView.setLayoutParams(params);
 
             // Set plz and chartType as tags to access them in OnClickListener
-            textView.setTag(R.string.plz_tag, data.get(i));
+            textView.setTag(R.string.plz_tag, zipcode);
             textView.setTag(R.string.charttype_tag, chartType);
 
             textView.setOnClickListener(new View.OnClickListener() {
@@ -708,7 +727,7 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
                 }
             });
 
-            textView.setText(data.get(i) + " " + dataHandler.fetchZipCodeName(data.get(i)));
+            textView.setText(zipcode + " " + dataHandler.fetchZipCodeName(zipcode));
             layout.addView(textView);
         }
     }
@@ -895,8 +914,10 @@ public class PLZActivity extends AppCompatActivity implements RestCallback, OAut
     }
 
     @Override
-    public void dataToViews(List<String> data, String chartType){
+    public void dataToViews(List<ComparableZipcode> data, String chartType){
+
         createEqualRegionViews(data, chartType);
+
     }
 
 }

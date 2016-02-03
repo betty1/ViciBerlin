@@ -210,20 +210,28 @@ public class MainActivity extends AppCompatActivity implements CustomMapView.Loc
     }
 
     private void setupMap(){
-        mapView.setTileSource(TileSourceFactory.MAPNIK);
+        IMapController mapController = mapView.getController();
+
+        // Touch handling
         mapView.callOnClick();
+        mapView.setPressListener(this);
+        mapView.setMultiTouchControls(true);
+
+        // Tile Source Factory
+        mapView.setTileSource(TileSourceFactory.MAPNIK);
+
+        // Zoom restrictions
+        mapController.setZoom(14);
         mapView.setMinZoomLevel(12);
         mapView.setMaxZoomLevel(20);
 
-        mapView.setMultiTouchControls(true);
-
-        IMapController mapController = mapView.getController();
-        mapController.setZoom(14);
+        // Centered point
         GeoPoint startPoint = new GeoPoint(52.5167, 13.3833);
         mapController.setCenter(startPoint);
 
-        mapView.setPressListener(this);
-        mapView.setScrollableAreaLimit(new BoundingBoxE6(52.673235, 13.762254, 52.338880, 13.089341));
+        // Bounding box
+        mapView.setScrollableAreaLimit(new BoundingBoxE6(52.673235, 13.762254,
+                52.338880, 13.089341));
     }
 
     private String getTwitterUserId(){

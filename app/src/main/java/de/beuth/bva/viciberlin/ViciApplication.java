@@ -13,15 +13,16 @@ import io.fabric.sdk.android.Fabric;
  */
 public class ViciApplication extends Application {
 
-        private static ViciApplication singleton;
+        private static ViciApplication instance;
 
         public ViciApplication getInstance(){
-            return singleton;
+            return instance;
         }
+
         @Override
         public void onCreate() {
             super.onCreate();
-            singleton = this;
+            instance = this;
 
             TwitterAuthConfig authConfig =  new TwitterAuthConfig(Constants.TWITTER_KEY, Constants.TWITTER_SECRET);
             Fabric.with(this, new TwitterCore(authConfig));

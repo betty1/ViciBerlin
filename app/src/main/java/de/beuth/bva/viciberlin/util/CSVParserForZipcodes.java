@@ -10,8 +10,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
+import de.beuth.bva.viciberlin.model.ComparableZipcode;
 import de.beuth.bva.viciberlin.model.ZipCodeResult;
+import retrofit.http.EncodedQuery;
 
 /**
  * Created by betty on 03/11/15.
@@ -30,8 +34,6 @@ public class CSVParserForZipCodes {
      * @return ZipCodeResult object with values and (if a zip code was looked up) with most equal zip codes
      */
     public static ZipCodeResult fetchZipCodeResult(Context context, String filename, String lookUp, int skip){
-
-        final int MOST_EQUAL_LIST_SIZE = 5;
 
         BufferedReader reader = null;
         float[] valuesOfZipCode = null;
@@ -88,7 +90,6 @@ public class CSVParserForZipCodes {
                                 valuesOfOtherZipCodes.put(lineName, valuesOfOtherZipCode);
                             }
                         }
-
                 }
             }
         } catch (Exception e) {
@@ -106,13 +107,13 @@ public class CSVParserForZipCodes {
             }
         }
 
-        List<String> mostEquals = null;
+        List<ComparableZipcode> otherZipcodes = new ArrayList<>();
         // Get list of most equals if actually looking for a zip code (not e.g. the average)
         if(lookUpZipCode){
-            mostEquals = mostEquals(valuesOfZipCode, valuesOfOtherZipCodes, MOST_EQUAL_LIST_SIZE);
+            otherZipcodes = getZipcodeDeviations(valuesOfZipCode, valuesOfOtherZipCodes);
         }
 
-        return new ZipCodeResult(valuesOfZipCode, mostEquals);
+        return new ZipCodeResult(valuesOfZipCode, otherZipcodes);
     }
 
     /**
@@ -126,6 +127,30 @@ public class CSVParserForZipCodes {
      */
     public static ZipCodeResult fetchZipCodeResult(Context context, String filename, String lookUp) {
         return fetchZipCodeResult(context, filename, lookUp, 0);
+    }
+
+    /**
+     * Creates a list of zip codes with the lowest average deviation from values of one specific zip code
+     */
+    public static List<ComparableZipcode> getZipcodeDeviations(float[] values, Map<String, float[]> valuesToCompare){
+
+        // Refuse incorrect requests
+        if(values == null || valuesToCompare == null){
+            return null;
+        }
+        List<ComparableZipcode> comparableZipcodes = new ArrayList<>();
+
+        for(String name : valuesToCompare.keySet()) {
+
+            float[] valuesOfOtherZipCode = valuesToCompare.get(name);
+            float deviation = getAverageDeviation(valuesOfOtherZipCode, values);
+
+            ComparableZipcode comparableZipcode = new ComparableZipcode(name, deviation);
+
+            comparableZipcodes.add(comparableZipcode);
+        }
+
+        return comparableZipcodes;
     }
 
     /**
@@ -153,70 +178,6 @@ public class CSVParserForZipCodes {
     }
 
     /**
-     * Creates a list of zip codes with the lowest average deviation from values of one specific zip code
-     *
-     * @param valuesOfZipCode values from specific zip code to be compared with the others
-     * @param valuesOfOtherZipCodes names and values from other zip codes
-     * @param numberOfResults max size of returned list
-     * @return list of most equal zip codes
-     */
-    private static List<String> mostEquals(float[] valuesOfZipCode, Map<String, float[]> valuesOfOtherZipCodes, int numberOfResults){
-
-        // Refuse incorrect requests
-        if(valuesOfZipCode == null || valuesOfOtherZipCodes == null || numberOfResults < 1){
-            return null;
-        }
-
-        List<Float> deviations = new ArrayList<>();
-        List<String> mostEqualZipCodes = new ArrayList<>();
-
-        for(String nameOfOtherZipCode : valuesOfOtherZipCodes.keySet()){
-
-            float[] valuesOfOtherZipCode = valuesOfOtherZipCodes.get(nameOfOtherZipCode);
-            float deviation = getAverageDeviation(valuesOfOtherZipCode, valuesOfZipCode);
-
-            int listSize = deviations.size();
-
-            // Check if list is full
-            if(listSize >= numberOfResults){
-                // shrink list
-                deviations = deviations.subList(0, numberOfResults);
-                mostEqualZipCodes = mostEqualZipCodes.subList(0, numberOfResults);
-
-                // If current deviation value if higher than last value in list, continue with next zipcode
-                if(deviations.get(numberOfResults-1) <= deviation){
-                    continue;
-                }
-            }
-
-            // List is not full yet
-            boolean notInList = true;
-            for(int i=0; i<listSize; i++){
-                if(i==numberOfResults){
-                    break;
-                }
-                // sort value in
-                if(deviation < deviations.get(i)){
-                    deviations.add(i, deviation);
-                    mostEqualZipCodes.add(i, nameOfOtherZipCode);
-                    notInList = false;
-                    break;
-                }
-            }
-            // if value is higher than all others, but list is not full, add to end
-            if(listSize < numberOfResults && notInList){
-                deviations.add(deviation);
-                mostEqualZipCodes.add(nameOfOtherZipCode);
-            }
-
-        }
-
-        // shrink list again
-        mostEqualZipCodes = mostEqualZipCodes.subList(0, numberOfResults);
-        return mostEqualZipCodes;
-    }
-
-    /**
      * Compares two float value arrays and returns the average deviation
      * @param values
      * @param compareValues
@@ -234,6 +195,38 @@ public class CSVParserForZipCodes {
         }
         return Math.round((deviationSum / values.length)*10)/10f;
     }
+
+
+    /**
+     * Creates a list of zip codes with the lowest average deviation from values of one specific zip code
+     *
+     * @param valuesOfZipCode values from specific zip code to be compared with the others
+     * @param valuesOfOtherZipCodes names and values from other zip codes
+     * @return list of most equal zip codes
+     */
+//    private static SortedMap<Float, String> mostEquals(float[] valuesOfZipCode, Map<String, float[]> valuesOfOtherZipCodes){
+//
+//        // Refuse incorrect requests
+//        if(valuesOfZipCode == null || valuesOfOtherZipCodes == null){
+//            return null;
+//        }
+//
+//        SortedMap<Float, String> equalZipCodes = new TreeMap<>();
+//
+//        for(String nameOfOtherZipCode : valuesOfOtherZipCodes.keySet()){
+//
+//            float[] valuesOfOtherZipCode = valuesOfOtherZipCodes.get(nameOfOtherZipCode);
+//            float deviation = getAverageDeviation(valuesOfOtherZipCode, valuesOfZipCode);
+//
+//            while(equalZipCodes.get(deviation) != null){
+//                deviation += 0.000001;
+//            }
+//            equalZipCodes.put(deviation, nameOfOtherZipCode);
+//        }
+//
+//        return equalZipCodes;
+//    }
+
 
     /**
      * Gets name of zip code area from a csv file
@@ -306,7 +299,7 @@ public class CSVParserForZipCodes {
                 String zipCode = lineSplit[0];
                 String name = lineSplit[1];
 
-                if(name.equals(Constants.ZIPCODE_TITLE)){
+                if(zipCode.equals(Constants.ZIPCODE_TITLE)){
                     continue;
                 }
 

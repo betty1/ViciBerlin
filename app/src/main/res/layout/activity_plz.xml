@@ -385,6 +385,50 @@
                 </LinearLayout>
                 <!--FOREIGNERS END-->
 
+                <!--COMPARE HEADER-->
+                <LinearLayout
+                    android:id="@+id/compare_header"
+                    style="?secondaryBar" >
+
+                    <ImageView
+                        android:id="@+id/compare_arrow"
+                        style="@style/ArrowMedium" />
+
+                    <TextView
+                        android:text="@string/compare"
+                        style="@style/BarText" />
+                </LinearLayout>
+                <!--COMPARE HEADER END-->
+
+                <!--COMPARE-->
+                <LinearLayout
+                    android:id="@+id/compare_linearlayout"
+                    style="@style/SubLayout" >
+
+                    <TextView
+                        android:text="@string/most_equal"
+                        android:textStyle="bold"
+                        style="@style/BarText" />
+
+                    <LinearLayout
+                        android:id="@+id/most_equal_linearlayout"
+                        style="@style/SubLayout"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:text="@string/less_equal"
+                        android:textStyle="bold"
+                        style="@style/BarText" />
+
+                    <LinearLayout
+                        android:id="@+id/less_equal_linearlayout"
+                        style="@style/SubLayout"
+                        android:visibility="visible" />
+
+                </LinearLayout>
+
+                <!--COMPARE END-->
+
             <!--DEMOGRAPHY END-->
 
             <!--RATING HEADER-->

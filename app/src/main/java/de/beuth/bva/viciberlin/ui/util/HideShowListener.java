@@ -24,7 +24,7 @@ public class HideShowListener implements View.OnClickListener {
         super();
         this.context = context;
         viewMap.put(R.id.map_header, new Integer[]{R.id.map_relativelayout, R.id.map_arrow});
-        viewMap.put(R.id.demography_header, new Integer[]{R.id.age_header, R.id.gender_header, R.id.location_header, R.id.duration_header, R.id.foreigners_header, R.id.demography_arrow});
+        viewMap.put(R.id.demography_header, new Integer[]{R.id.age_header, R.id.gender_header, R.id.location_header, R.id.duration_header, R.id.foreigners_header, R.id.compare_header, R.id.demography_arrow});
         viewMap.put(R.id.age_header, new Integer[]{R.id.age_linearlayout, R.id.age_arrow});
         viewMap.put(R.id.age_equal_header, new Integer[]{R.id.age_equal_linearlayout, R.id.age_equal_arrow});
         viewMap.put(R.id.gender_header, new Integer[]{R.id.gender_linearlayout, R.id.gender_arrow});
@@ -34,6 +34,7 @@ public class HideShowListener implements View.OnClickListener {
         viewMap.put(R.id.duration_equal_header, new Integer[]{R.id.duration_equal_linearlayout, R.id.duration_equal_arrow});
         viewMap.put(R.id.foreigners_header, new Integer[]{R.id.foreigners_linearlayout, R.id.foreigners_arrow});
         viewMap.put(R.id.foreigners_equal_header, new Integer[]{R.id.foreigners_equal_linearlayout, R.id.foreigners_equal_arrow});
+        viewMap.put(R.id.compare_header, new Integer[]{R.id.compare_linearlayout, R.id.compare_arrow});
         viewMap.put(R.id.rating_header, new Integer[]{R.id.rating_linearlayout, R.id.rating_arrow});
         viewMap.put(R.id.yelp_header, new Integer[]{R.id.yelp_linearlayout, R.id.yelp_arrow});
         viewMap.put(R.id.twitter_header, new Integer[]{R.id.twitter_flowlayout, R.id.twitter_arrow});

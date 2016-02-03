@@ -1,5 +1,6 @@
 package de.beuth.bva.viciberlin.model;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -8,9 +9,9 @@ import java.util.List;
 public class ZipCodeResult {
 
     float[] values;
-    List<String> mostEquals;
+    List<ComparableZipcode> mostEquals;
 
-    public ZipCodeResult(float[] values, List<String> mostEquals) {
+    public ZipCodeResult(float[] values, List<ComparableZipcode> mostEquals) {
         this.values = values;
         this.mostEquals = mostEquals;
     }
@@ -19,10 +20,9 @@ public class ZipCodeResult {
         return values;
     }
 
-    public List<String> getMostEquals() {
+    public List<ComparableZipcode> getMostEquals() {
+        Collections.sort(mostEquals);
         return mostEquals;
     }
-
-
 
 }

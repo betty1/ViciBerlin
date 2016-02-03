@@ -43,37 +43,44 @@ public class CustomMapView extends MapView {
         super(context, new DefaultResourceProxyImpl(context), null, null, attrs);
     }
 
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        int actionType = ev.getAction();
-        switch (actionType) {
-            case MotionEvent.ACTION_DOWN:
-                Projection proj = this.getProjection();
-                IGeoPoint loc = proj.fromPixels((int) ev.getX(), (int) ev.getY());
-                latitude = (double) loc.getLatitudeE6()/1000000;
-                longitude = (double)loc.getLongitudeE6()/1000000;
-        }
-        gestureDetector.onTouchEvent(ev);
-        return super.dispatchTouchEvent(ev);
-    }
-
     public void setPressListener(LocationPressListener listener){
         this.pressListener = listener;
     }
 
-    final GestureDetector gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        int actionType = ev.getAction();
+        switch (actionType) {
+
+            // Catch action down events and get latitude and longitude from projection
+            case MotionEvent.ACTION_DOWN:
+
+                Projection proj = this.getProjection();
+                IGeoPoint loc = proj.fromPixels((int) ev.getX(), (int) ev.getY());
+                latitude = (double) loc.getLatitudeE6()/1000000;
+                longitude = (double)loc.getLongitudeE6()/1000000;
+
+        }
+
+        // forward event to GestureDetector
+        gestureDetector.onTouchEvent(ev);
+        return super.dispatchTouchEvent(ev);
+    }
+
+    final GestureDetector gestureDetector = new GestureDetector(getContext(),
+            new GestureDetector.SimpleOnGestureListener() {
         @Override
         public void onLongPress(MotionEvent e) {
             if(pressListener != null){
                 pressListener.onLocationPress(latitude, longitude);
             }
-            Log.d(TAG, "Longitude: "+ longitude +" Latitude: "+ latitude);
         }
     });
 
     public interface LocationPressListener {
         void onLocationPress(double lat, double lng);
     }
+//    Log.d(TAG, "Longitude: "+ longitude +" Latitude: "+ latitude);
 
 }
 

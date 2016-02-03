@@ -17,6 +17,8 @@ public class Constants {
     public static final String DURATION_CHART = "durationChart";
     public static final String FOREIGNERS_CHART = "foreignersChart";
     public static final String FOREIGNERS_HISTORY_CHART = "foreignersHistoryChart";
+    public static final String MOST_EQUAL_CHART = "mostEqualChart";
+    public static final String LESS_EQUAL_CHART = "lessEqualChart";
 
     public static final String AVERAGE_TITLE = "average";
     public static final String ZIPCODE_TITLE = "zipcode";

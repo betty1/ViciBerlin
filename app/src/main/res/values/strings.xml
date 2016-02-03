@@ -22,6 +22,9 @@
     <string name="location">Wohnlage</string>
     <string name="duration">Wohndauer</string>
     <string name="foreigners">Ausländeranteil</string>
+    <string name="compare">Andere Bezirke im Vergleich</string>
+    <string name="most_equal">Ähnlichste Bezirke</string>
+    <string name="less_equal">Unterschiedlichste Bezirke</string>
     <string name="restaurants">Restaurants:&#160;</string>
     <string name="cafes">Cafés:&#160;</string>
     <string name="nightlife">Nightlife:&#160;</string>
