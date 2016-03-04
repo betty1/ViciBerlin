@@ -5,11 +5,14 @@ package de.beuth.bva.viciberlin.util;
  */
 public class Constants {
 
-    public static final String PLZ_INTENT = "plzIntent";
-    public static final String PLZ_EXTRA = "plzExtra";
+    // Intents
+    public static final String ZIP_INTENT = "plzIntent";
+    public static final String ZIP_EXTRA = "plzExtra";
+    public static final String ZIP_NAME_EXTRA = "plzNameExtra";
     public static final String PREOPEN_EXTRA = "preopen";
     public static final String ZIPOFUSER_EXTRA = "zipOfUser";
 
+    // Charts
     public static final String AGE_CHART = "ageChart";
     public static final String AGE_HISTORY_CHART = "ageHistoryChart";
     public static final String GENDER_CHART = "genderChart";
@@ -20,10 +23,7 @@ public class Constants {
     public static final String MOST_EQUAL_CHART = "mostEqualChart";
     public static final String LESS_EQUAL_CHART = "lessEqualChart";
 
-    public static final String AVERAGE_TITLE = "average";
-    public static final String ZIPCODE_TITLE = "zipcode";
-
-    // Keys
+    // Twitter Keys
     public static final String TWITTER_KEY = "NLkaOeflUB0j8bogUDwmlt5e4";
     public static final String TWITTER_SECRET = "SSeiYYNhy4cmX4RyflA0dOruugnUDVu4sP1jureS1xMW100teT";
 
@@ -35,7 +35,7 @@ public class Constants {
     public static final String TWITTER_USERID = "TwitterUserid";
 
     // Rating API
-    public static final String RATING_URL = "http://vici-berlin.herokuapp.com/rating/";
+    public static final String RATING_ENDPOINT = "http://vici-berlin.herokuapp.com/rating/";
 
     // CSV Files
     public static final String AGE_FILE = "age.csv";
@@ -48,7 +48,19 @@ public class Constants {
     public static final String LOCATION_FILE = "location.csv";
     public static final String NAMES_FILE = "zipcode_names.csv";
 
+    public static final String AVERAGE_LINE = "average";
+    public static final String ZIPCODE_LINE = "zipcode";
+
     // Arrow states
     public static final String ARROW_UP = "arrow_up";
+
+    // Map Values
+    public static final double BERLIN_LAT = 52.5167;
+    public static final double BERLIN_LNG = 13.3833;
+
+    public static final double BERLIN_NORTH = 52.673235;
+    public static final double BERLIN_EAST = 13.762254;
+    public static final double BERLIN_SOUTH = 52.338880;
+    public static final double BERLIN_WEST = 13.089341;
 
 }

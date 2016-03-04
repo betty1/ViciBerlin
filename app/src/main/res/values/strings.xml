@@ -70,6 +70,7 @@
     <string name="no_berlin_zipcode">Bitte wählen Sie eine Berliner PLZ</string>
     <string name="no_available_zipcode">Bitte wählen Sie einen anderen Ort in der Nähe</string>
     <string name="no_internet">Schwache Internetverbindung, bitte geben Sie die PLZ in das Suchfeld ein</string>
+    <string name="activate_location_services">Bitte aktivieren Sie Location Services und warten Sie einen Moment, damit Ihr Standort ermittelt werden kann.</string>
     <string name="none">keine</string>
     <string name="title_activity_draw">DrawActivity</string>
 

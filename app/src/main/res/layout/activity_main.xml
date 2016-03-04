@@ -81,14 +81,13 @@
                 android:layout_alignLeft="@+id/map"
                 android:layout_alignBottom="@+id/map"
                 android:layout_alignRight="@+id/map"
-                android:background="#aa000000"
+                android:background="#33000000"
                 android:id="@+id/map_progress_layer"
-                android:visibility="invisible">
+                android:visibility="invisible" >
 
                 <ProgressBar
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/progressBar2"
                     android:layout_gravity="center" />
             </FrameLayout>
 

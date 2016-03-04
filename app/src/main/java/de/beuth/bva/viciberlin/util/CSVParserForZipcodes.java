@@ -10,19 +10,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import de.beuth.bva.viciberlin.model.ComparableZipcode;
 import de.beuth.bva.viciberlin.model.ZipCodeResult;
-import retrofit.http.EncodedQuery;
 
 /**
  * Created by betty on 03/11/15.
  */
 public class CSVParserForZipCodes {
 
-    final static String TAG = "CSVParserForZipCodes";
+    final static String TAG = CSVParserForZipCodes.class.getSimpleName();
 
     /**
      * Collects values from a csv file for a specific zip code or special line (e.g. average)
@@ -30,17 +27,17 @@ public class CSVParserForZipCodes {
      *
      * @param context
      * @param filename csv file name
-     * @param lookUp a specific zip code or a line title constant like 'Constants.AVERAGE_TITLE'
+     * @param lookUp   a specific zip code or a line title constant like 'Constants.AVERAGE_LINE'
      * @return ZipCodeResult object with values and (if a zip code was looked up) with most equal zip codes
      */
-    public static ZipCodeResult fetchZipCodeResult(Context context, String filename, String lookUp, int skip){
+    public static ZipCodeResult fetchZipCodeResult(Context context, String filename, String lookUp, int skip) {
 
         BufferedReader reader = null;
         float[] valuesOfZipCode = null;
         Map<String, float[]> valuesOfOtherZipCodes = new HashMap<>();
 
         // Check if looking for a zip code or for a special line name
-        boolean lookUpZipCode = !lookUp.equals(Constants.AVERAGE_TITLE);
+        boolean lookUpZipCode = !lookUp.equals(Constants.AVERAGE_LINE);
 
         try {
             reader = new BufferedReader(
@@ -55,37 +52,37 @@ public class CSVParserForZipCodes {
                 String[] lineSplit = line.split(";");
 
                 String lineName = lineSplit[0];
-                int attributeCount = lineSplit.length-1-skip;
+                int attributeCount = lineSplit.length - 1 - skip;
 
                 // Check if linename is a zipcode or one of the special values
-                switch(lineName){
-                    case Constants.ZIPCODE_TITLE:
+                switch (lineName) {
+                    case Constants.ZIPCODE_LINE:
                         continue;
-                    case Constants.AVERAGE_TITLE:
-                        if(lookUpZipCode){
+                    case Constants.AVERAGE_LINE:
+                        if (lookUpZipCode) {
                             continue;
                         }
                     default:
 
-                        if(lineName.equals(lookUp)) {
+                        if (lineName.equals(lookUp)) {
 
                             // save values for selected zipCode or average
                             valuesOfZipCode = new float[attributeCount];
 
-                            for(int i = 0; i < attributeCount; i++){
-                                valuesOfZipCode[i] = Float.parseFloat(lineSplit[1+i]);
+                            for (int i = 0; i < attributeCount; i++) {
+                                valuesOfZipCode[i] = Float.parseFloat(lineSplit[1 + i]);
                             }
 
                         } else {
 
                             // don't look for equal regions if just looking up average values
-                            if(lookUpZipCode){
+                            if (lookUpZipCode) {
 
                                 // save values of other zipcodes for comparison
                                 float[] valuesOfOtherZipCode = new float[attributeCount];
 
-                                for(int i=0; i<attributeCount; i++){
-                                    valuesOfOtherZipCode[i] = Float.parseFloat(lineSplit[1+i]);
+                                for (int i = 0; i < attributeCount; i++) {
+                                    valuesOfOtherZipCode[i] = Float.parseFloat(lineSplit[1 + i]);
                                 }
                                 valuesOfOtherZipCodes.put(lineName, valuesOfOtherZipCode);
                             }
@@ -108,8 +105,9 @@ public class CSVParserForZipCodes {
         }
 
         List<ComparableZipcode> otherZipcodes = new ArrayList<>();
+
         // Get list of most equals if actually looking for a zip code (not e.g. the average)
-        if(lookUpZipCode){
+        if (lookUpZipCode) {
             otherZipcodes = getZipcodeDeviations(valuesOfZipCode, valuesOfOtherZipCodes);
         }
 
@@ -122,7 +120,7 @@ public class CSVParserForZipCodes {
      *
      * @param context
      * @param filename csv file name
-     * @param lookUp a specific zip code or a line title constant like 'Constants.AVERAGE_TITLE'
+     * @param lookUp   a specific zip code or a line title constant like 'Constants.AVERAGE_LINE'
      * @return ZipCodeResult object with values and (if a zip code was looked up) with most equal zip codes
      */
     public static ZipCodeResult fetchZipCodeResult(Context context, String filename, String lookUp) {
@@ -132,15 +130,15 @@ public class CSVParserForZipCodes {
     /**
      * Creates a list of zip codes with the lowest average deviation from values of one specific zip code
      */
-    public static List<ComparableZipcode> getZipcodeDeviations(float[] values, Map<String, float[]> valuesToCompare){
+    public static List<ComparableZipcode> getZipcodeDeviations(float[] values, Map<String, float[]> valuesToCompare) {
 
         // Refuse incorrect requests
-        if(values == null || valuesToCompare == null){
+        if (values == null || valuesToCompare == null) {
             return null;
         }
         List<ComparableZipcode> comparableZipcodes = new ArrayList<>();
 
-        for(String name : valuesToCompare.keySet()) {
+        for (String name : valuesToCompare.keySet()) {
 
             float[] valuesOfOtherZipCode = valuesToCompare.get(name);
             float deviation = getAverageDeviation(valuesOfOtherZipCode, values);
@@ -158,11 +156,11 @@ public class CSVParserForZipCodes {
      *
      * @param context
      * @param filename csv file name
-     * @param skip nr of columns to skip at the end of the line
+     * @param skip     nr of columns to skip at the end of the line
      * @return array of average float values from csv
      */
-    public static float[] fetchAverageResult(Context context, String filename, int skip){
-        ZipCodeResult result = fetchZipCodeResult(context, filename, Constants.AVERAGE_TITLE, skip);
+    public static float[] fetchAverageResult(Context context, String filename, int skip) {
+        ZipCodeResult result = fetchZipCodeResult(context, filename, Constants.AVERAGE_LINE, skip);
         return result.getValues();
     }
 
@@ -179,63 +177,33 @@ public class CSVParserForZipCodes {
 
     /**
      * Compares two float value arrays and returns the average deviation
+     *
      * @param values
      * @param compareValues
      * @return Average deviation of values from 'values' and 'compareValues'
      */
-    private static float getAverageDeviation(float[] values, float[] compareValues){
-        if(values.length != compareValues.length || values.length == 0){
+    private static float getAverageDeviation(float[] values, float[] compareValues) {
+        if (values.length != compareValues.length || values.length == 0) {
             Log.d(TAG, "Couldnt compare values to get deviation");
             return -1;
         }
         float deviationSum = 0;
-        for(int i=0; i<values.length; i++){
+        for (int i = 0; i < values.length; i++) {
             float deviation = Math.abs(values[i] - compareValues[i]);
             deviationSum += deviation;
         }
-        return Math.round((deviationSum / values.length)*10)/10f;
+        return Math.round((deviationSum / values.length) * 10) / 10f;
     }
-
-
-    /**
-     * Creates a list of zip codes with the lowest average deviation from values of one specific zip code
-     *
-     * @param valuesOfZipCode values from specific zip code to be compared with the others
-     * @param valuesOfOtherZipCodes names and values from other zip codes
-     * @return list of most equal zip codes
-     */
-//    private static SortedMap<Float, String> mostEquals(float[] valuesOfZipCode, Map<String, float[]> valuesOfOtherZipCodes){
-//
-//        // Refuse incorrect requests
-//        if(valuesOfZipCode == null || valuesOfOtherZipCodes == null){
-//            return null;
-//        }
-//
-//        SortedMap<Float, String> equalZipCodes = new TreeMap<>();
-//
-//        for(String nameOfOtherZipCode : valuesOfOtherZipCodes.keySet()){
-//
-//            float[] valuesOfOtherZipCode = valuesOfOtherZipCodes.get(nameOfOtherZipCode);
-//            float deviation = getAverageDeviation(valuesOfOtherZipCode, valuesOfZipCode);
-//
-//            while(equalZipCodes.get(deviation) != null){
-//                deviation += 0.000001;
-//            }
-//            equalZipCodes.put(deviation, nameOfOtherZipCode);
-//        }
-//
-//        return equalZipCodes;
-//    }
-
 
     /**
      * Gets name of zip code area from a csv file
+     *
      * @param context
      * @param filename csv file name
-     * @param zipCode zipcode to look up name for
+     * @param zipCode  zipcode to look up name for
      * @return name of zip code area
      */
-    public static String getNameForZipCode(Context context, String filename, String zipCode){
+    public static String getNameForZipCode(Context context, String filename, String zipCode) {
 
         boolean zipCodeFound = false;
         BufferedReader reader = null;
@@ -249,7 +217,7 @@ public class CSVParserForZipCodes {
             while ((line = reader.readLine()) != null) {
                 String[] lineSplit = line.split(";");
 
-                if(lineSplit[0].equals(zipCode)){
+                if (lineSplit[0].equals(zipCode)) {
                     zipCodeFound = true;
 
                     name = lineSplit[1];
@@ -272,7 +240,7 @@ public class CSVParserForZipCodes {
             }
         }
 
-        if(!zipCodeFound){
+        if (!zipCodeFound) {
             name = null;
         }
         return name;
@@ -280,11 +248,12 @@ public class CSVParserForZipCodes {
 
     /**
      * Gets a list of zip codes representation Strings that match the current query
+     *
      * @param context
-     * @param query String e.g. entered by user
+     * @param query   String e.g. entered by user
      * @return list of all zip codes with their names that match the query
      */
-    public static List<String> getZipCodeSuggestionForQuery(Context context, String query){
+    public static List<String> getZipCodeSuggestionForQuery(Context context, String query) {
 
         BufferedReader reader = null;
         List<String> suggestions = new ArrayList<>();
@@ -299,13 +268,13 @@ public class CSVParserForZipCodes {
                 String zipCode = lineSplit[0];
                 String name = lineSplit[1];
 
-                if(zipCode.equals(Constants.ZIPCODE_TITLE)){
+                if (zipCode.equals(Constants.ZIPCODE_LINE)) {
                     continue;
                 }
 
-                if(zipCode.startsWith(query)){
+                if (zipCode.startsWith(query)) {
                     suggestions.add(zipCode + " " + name);
-                } else if(name.toLowerCase().startsWith(query.toLowerCase())){
+                } else if (name.toLowerCase().startsWith(query.toLowerCase())) {
                     suggestions.add(zipCode + " " + name);
                 }
             }
@@ -325,4 +294,4 @@ public class CSVParserForZipCodes {
 
         return suggestions;
     }
-    }
+}

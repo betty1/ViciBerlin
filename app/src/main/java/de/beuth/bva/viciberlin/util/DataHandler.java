@@ -9,9 +9,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.SortedMap;
 
 import de.beuth.bva.viciberlin.R;
 import de.beuth.bva.viciberlin.model.ChartAttributes;
@@ -28,7 +26,7 @@ public class DataHandler {
     Resources res;
     Context context;
     DataReceiver receiver;
-    String plz;
+    String zip;
 
     public DataHandler(Context context, DataReceiver receiver){
 
@@ -37,14 +35,14 @@ public class DataHandler {
         res = context.getResources();
     }
 
-    public void setPlz(String plz){
-        this.plz = plz;
+    public void setZip(String zip){
+        this.zip = zip;
     }
 
     public void fillCharts(){
 
         // AGE CHART
-        ZipCodeResult age = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.AGE_FILE, plz);
+        ZipCodeResult age = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.AGE_FILE, zip);
         float[] ageValues = age.getValues();
         List<ComparableZipcode> ageMostEquals = age.getMostEquals();
 
@@ -56,7 +54,7 @@ public class DataHandler {
         // AGE CHART END
 
         // AGE HISTORY CHART
-        ZipCodeResult ageHistory = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.AGE_HISTORY_FILE, plz);
+        ZipCodeResult ageHistory = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.AGE_HISTORY_FILE, zip);
         float[] ageHistoryValues = ageHistory.getValues();
 
         float[] ageHistoryAverages = CSVParserForZipCodes.fetchAverageResult(context, Constants.AGE_HISTORY_FILE);
@@ -65,7 +63,7 @@ public class DataHandler {
         // AGE HISTORY CHART END
 
         // GENDER CHART
-        ZipCodeResult gender = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.GENDER_FILE, plz);
+        ZipCodeResult gender = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.GENDER_FILE, zip);
         float[] genderValues = gender.getValues();
 //        List<String> genderMostEquals = gender.getMostEquals();
 
@@ -76,7 +74,7 @@ public class DataHandler {
         // GENDER CHART END
 
         // LOCATION CHART
-        ZipCodeResult location = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.LOCATION_FILE, plz, 1);
+        ZipCodeResult location = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.LOCATION_FILE, zip, 1);
         float[] locationValues = location.getValues();
         List<ComparableZipcode> locationMostEquals = location.getMostEquals();
 
@@ -88,7 +86,7 @@ public class DataHandler {
         // LOCATION CHART END
 
         // DURATION CHART
-        ZipCodeResult duration = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.DURATION_FILE, plz);
+        ZipCodeResult duration = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.DURATION_FILE, zip);
         float[] durationValues = duration.getValues();
         List<ComparableZipcode> durationMostEquals = duration.getMostEquals();
 
@@ -100,7 +98,7 @@ public class DataHandler {
         // DURATION CHART END
 
         // FOREIGNERS CHART
-        ZipCodeResult foreigners = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.FOREIGNERS_FILE, plz);
+        ZipCodeResult foreigners = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.FOREIGNERS_FILE, zip);
         float[] foreignersValues = foreigners.getValues();
         List<ComparableZipcode> foreignersMostEquals = foreigners.getMostEquals();
 
@@ -112,7 +110,7 @@ public class DataHandler {
         // FOREIGNERS CHART END
 
         // FOREIGNERS HISTORY CHART
-        ZipCodeResult foreignersHistory = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.FOREIGNERS_HISTORY_FILE, plz);
+        ZipCodeResult foreignersHistory = CSVParserForZipCodes.fetchZipCodeResult(context, Constants.FOREIGNERS_HISTORY_FILE, zip);
         float[] foreignersHistoryValues = foreignersHistory.getValues();
 
         float[] foreignersHistoryAverages = CSVParserForZipCodes.fetchAverageResult(context, Constants.FOREIGNERS_HISTORY_FILE);
@@ -135,16 +133,11 @@ public class DataHandler {
         }
         // TOTAL MOST EQUAL END
 
-//        area = CSVParserForZipCodes.getFloatValuesForZipCode(context, "area.csv", plz)[0];
+//        area = CSVParserForZipCodes.getFloatValuesForZipCode(context, "area.csv", zip)[0];
     }
 
-    public String fetchZipCodeName(){
-        String name = CSVParserForZipCodes.getNameForZipCode(context, Constants.NAMES_FILE, plz);
-        return name;
-    }
-
-    public String fetchZipCodeName(String customPlz){
-        String name = CSVParserForZipCodes.getNameForZipCode(context, Constants.NAMES_FILE, customPlz);
+    public String fetchZipName(){
+        String name = CSVParserForZipCodes.getNameForZipCode(context, Constants.NAMES_FILE, zip);
         return name;
     }
 
@@ -177,7 +170,7 @@ public class DataHandler {
     }
 
     public int fetchYelpTotals(String result) {
-        if(plz != null && !plz.equals("")){
+        if(zip != null && !zip.equals("")){
             try {
                 JSONObject jsonResult = new JSONObject(result);
                 int total = jsonResult.getInt("total");
@@ -226,6 +219,11 @@ public class DataHandler {
             Log.d(TAG, "Error parsing rating values");
         }
         return ratingValues;
+    }
+
+    public static String fetchZipName(Context context, String customZip){
+        String name = CSVParserForZipCodes.getNameForZipCode(context, Constants.NAMES_FILE, customZip);
+        return name;
     }
 
     public interface DataReceiver {

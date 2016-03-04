@@ -20,11 +20,12 @@ import org.osmdroid.views.Projection;
  */
 public class CustomMapView extends MapView {
 
-    private static final String TAG = "CustomMapView";
+    private static final String TAG = CustomMapView.class.getSimpleName();
     double longitude;
     double latitude;
 
     LocationPressListener pressListener;
+    boolean inLongPress = false;
 
     public CustomMapView(final Context context, final AttributeSet attrs) {
         super(context, new DefaultResourceProxyImpl(context), null, null, attrs);
@@ -48,29 +49,33 @@ public class CustomMapView extends MapView {
     }
 
     @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        int actionType = ev.getAction();
+    public boolean dispatchTouchEvent(MotionEvent e) {
+        int actionType = e.getAction();
         switch (actionType) {
 
             // Catch action down events and get latitude and longitude from projection
             case MotionEvent.ACTION_DOWN:
-
-                Projection proj = this.getProjection();
-                IGeoPoint loc = proj.fromPixels((int) ev.getX(), (int) ev.getY());
+                Projection projection = getProjection();
+                IGeoPoint loc = projection.fromPixels((int) e.getX(), (int) e.getY());
                 latitude = (double) loc.getLatitudeE6()/1000000;
                 longitude = (double)loc.getLongitudeE6()/1000000;
-
+                break;
+            case MotionEvent.ACTION_UP:
+                if(inLongPress && pressListener != null){
+                    pressListener.onPressReleased();
+                }
         }
 
         // forward event to GestureDetector
-        gestureDetector.onTouchEvent(ev);
-        return super.dispatchTouchEvent(ev);
+        gestureDetector.onTouchEvent(e);
+        return super.dispatchTouchEvent(e);
     }
 
     final GestureDetector gestureDetector = new GestureDetector(getContext(),
             new GestureDetector.SimpleOnGestureListener() {
         @Override
         public void onLongPress(MotionEvent e) {
+            inLongPress = true;
             if(pressListener != null){
                 pressListener.onLocationPress(latitude, longitude);
             }
@@ -79,8 +84,8 @@ public class CustomMapView extends MapView {
 
     public interface LocationPressListener {
         void onLocationPress(double lat, double lng);
+        void onPressReleased();
     }
-//    Log.d(TAG, "Longitude: "+ longitude +" Latitude: "+ latitude);
 
 }
 
