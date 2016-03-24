@@ -86,6 +86,7 @@
 
     <!--Tags-->
     <string name="plz_tag">plzTag</string>
+    <string name="plz_name_tag">plzNameTag</string>
     <string name="charttype_tag">chartTypeTag</string>
 
 

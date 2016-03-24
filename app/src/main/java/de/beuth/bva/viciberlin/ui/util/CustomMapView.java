@@ -3,15 +3,11 @@ package de.beuth.bva.viciberlin.ui.util;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.widget.RadioButton;
-import android.widget.Toast;
 
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.api.IGeoPoint;
-import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.Projection;
 
@@ -25,7 +21,6 @@ public class CustomMapView extends MapView {
     double latitude;
 
     LocationPressListener pressListener;
-    boolean inLongPress = false;
 
     public CustomMapView(final Context context, final AttributeSet attrs) {
         super(context, new DefaultResourceProxyImpl(context), null, null, attrs);
@@ -44,7 +39,7 @@ public class CustomMapView extends MapView {
         super(context, new DefaultResourceProxyImpl(context), null, null, attrs);
     }
 
-    public void setPressListener(LocationPressListener listener){
+    public void setPressListener(LocationPressListener listener) {
         this.pressListener = listener;
     }
 
@@ -57,13 +52,9 @@ public class CustomMapView extends MapView {
             case MotionEvent.ACTION_DOWN:
                 Projection projection = getProjection();
                 IGeoPoint loc = projection.fromPixels((int) e.getX(), (int) e.getY());
-                latitude = (double) loc.getLatitudeE6()/1000000;
-                longitude = (double)loc.getLongitudeE6()/1000000;
+                latitude = (double) loc.getLatitudeE6() / 1000000;
+                longitude = (double) loc.getLongitudeE6() / 1000000;
                 break;
-            case MotionEvent.ACTION_UP:
-                if(inLongPress && pressListener != null){
-                    pressListener.onPressReleased();
-                }
         }
 
         // forward event to GestureDetector
@@ -73,18 +64,16 @@ public class CustomMapView extends MapView {
 
     final GestureDetector gestureDetector = new GestureDetector(getContext(),
             new GestureDetector.SimpleOnGestureListener() {
-        @Override
-        public void onLongPress(MotionEvent e) {
-            inLongPress = true;
-            if(pressListener != null){
-                pressListener.onLocationPress(latitude, longitude);
-            }
-        }
-    });
+                @Override
+                public void onLongPress(MotionEvent e) {
+                    if (pressListener != null) {
+                        pressListener.onLocationPress(latitude, longitude);
+                    }
+                }
+            });
 
     public interface LocationPressListener {
         void onLocationPress(double lat, double lng);
-        void onPressReleased();
     }
 
 }

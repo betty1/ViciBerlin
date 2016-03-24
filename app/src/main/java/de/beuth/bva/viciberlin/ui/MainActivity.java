@@ -1,29 +1,16 @@
 package de.beuth.bva.viciberlin.ui;
 
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
-import android.database.MatrixCursor;
-import android.location.Location;
 import android.os.Bundle;
-import android.provider.BaseColumns;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AutoCompleteTextView;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.SearchView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import org.osmdroid.api.IMapController;
@@ -31,21 +18,19 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 
-import java.util.List;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import de.beuth.bva.viciberlin.R;
 import de.beuth.bva.viciberlin.geo.GeoProvider;
 import de.beuth.bva.viciberlin.geo.GoogleLocationProvider;
 import de.beuth.bva.viciberlin.ui.util.CustomMapView;
-import de.beuth.bva.viciberlin.util.CSVParserForZipCodes;
 import de.beuth.bva.viciberlin.util.Constants;
 import de.beuth.bva.viciberlin.util.DataHandler;
 
-public class MainActivity extends BaseActivity implements CustomMapView.LocationPressListener, GoogleLocationProvider.LocationListener {
+public class MainActivity extends BaseActivity implements CustomMapView.LocationPressListener, GeoProvider.Listener {
 
-    private static final String TAG = "MainActivity";
+    final String TAG = MainActivity.class.getSimpleName();
+
     @Bind(R.id.map)
     CustomMapView mapView;
     @Bind(R.id.drawer_layout)
@@ -59,9 +44,7 @@ public class MainActivity extends BaseActivity implements CustomMapView.Location
 
     private ActionBarDrawerToggle drawerToggle;
 
-    // Location
-    GoogleLocationProvider locationProvider;
-    String zipCodeOfUser;
+    private boolean isProcessingMap = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,13 +74,6 @@ public class MainActivity extends BaseActivity implements CustomMapView.Location
         locationProvider.stopLocationUpdates();
 
         mapView.getTileProvider().clearTileCache();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        configureSearchView(menu);
-        return true;
     }
 
     @Override
@@ -178,45 +154,46 @@ public class MainActivity extends BaseActivity implements CustomMapView.Location
     @Override
     public void onLocationPress(double lat, double lng) {
 
-        mapProgressLayer.setVisibility(View.VISIBLE);
+        // Check whether a map request is already in process
+        if (!isProcessingMap) {
+            isProcessingMap = true;
 
-        String plz = GeoProvider.plzFromLatLng(this, lat, lng);
+            mapProgressLayer.setVisibility(View.VISIBLE);
 
-        if (plz == GeoProvider.NO_SERVER_RESPONSE) {
-            Toast.makeText(this, res.getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
-            return;
-        } else if (plz == GeoProvider.NO_ZIP_AVAILABLE) {
-            Toast.makeText(this, res.getString(R.string.no_available_zipcode), Toast.LENGTH_SHORT).show();
-            return;
+            GeoProvider.zipFromLatLng(this, lat, lng, this);
         }
-
-        // Get name of zipcode region
-        String name = DataHandler.fetchZipName(this, plz);
-
-        if (name == null) {
-            Toast.makeText(this, res.getString(R.string.no_berlin_zipcode), Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        Intent intent = new Intent(getApplicationContext(), PLZActivity.class);
-        intent.setAction(Constants.ZIP_INTENT);
-        intent.putExtra(Constants.ZIP_EXTRA, plz);
-        intent.putExtra(Constants.ZIP_NAME_EXTRA, name);
-        startActivity(intent);
     }
 
     @Override
-    public void onPressReleased() {
+    public void onZipCodeResult(String zip) {
+
         mapProgressLayer.setVisibility(View.INVISIBLE);
-    }
+        isProcessingMap = false;
 
-    @Override
-    public void onLocationUpdate(Location loc) {
-        zipCodeOfUser = GeoProvider.plzFromLatLng(this, loc.getLatitude(), loc.getLongitude());
-        Log.d(TAG, "New Location: " + zipCodeOfUser);
+        if (zip != null) {
 
-        if (zipCodeOfUser != null) {
-            locationProvider.stopLocationUpdates();
+            if (zip == GeoProvider.NO_SERVER_RESPONSE) {
+                Toast.makeText(this, res.getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
+                return;
+            } else if (zip == GeoProvider.NO_ZIP_AVAILABLE) {
+                Toast.makeText(this, res.getString(R.string.no_available_zipcode), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Get name of zipcode region
+            String name = DataHandler.fetchZipName(this, zip);
+
+            if (name == null) {
+                Toast.makeText(this, res.getString(R.string.no_berlin_zipcode), Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            Intent intent = new Intent(getApplicationContext(), PLZActivity.class);
+            intent.setAction(Constants.ZIP_INTENT);
+            intent.putExtra(Constants.ZIP_EXTRA, zip);
+            intent.putExtra(Constants.ZIP_NAME_EXTRA, name);
+            startActivity(intent);
+
         }
     }
 

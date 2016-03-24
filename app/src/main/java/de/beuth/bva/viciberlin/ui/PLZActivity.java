@@ -1,37 +1,27 @@
 package de.beuth.bva.viciberlin.ui;
 
 import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
-import android.content.res.Resources;
-import android.database.MatrixCursor;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.BaseColumns;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.CursorAdapter;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
-import android.widget.SearchView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.apmem.tools.layouts.FlowLayout;
 import org.json.JSONObject;
@@ -47,7 +37,6 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import de.beuth.bva.viciberlin.R;
-import de.beuth.bva.viciberlin.geo.GeoProvider;
 import de.beuth.bva.viciberlin.geo.GoogleLocationProvider;
 import de.beuth.bva.viciberlin.model.ChartAttributes;
 import de.beuth.bva.viciberlin.model.ComparableZipcode;
@@ -57,7 +46,6 @@ import de.beuth.bva.viciberlin.rest.RestCallback;
 import de.beuth.bva.viciberlin.rest.VolleyRestProvider;
 import de.beuth.bva.viciberlin.ui.util.CustomMiniMapView;
 import de.beuth.bva.viciberlin.ui.util.HideShowListener;
-import de.beuth.bva.viciberlin.util.CSVParserForZipCodes;
 import de.beuth.bva.viciberlin.util.Constants;
 import de.beuth.bva.viciberlin.util.DataHandler;
 import de.beuth.bva.viciberlin.util.UserLoginControl;
@@ -70,9 +58,9 @@ import lecho.lib.hellocharts.model.SubcolumnValue;
 import lecho.lib.hellocharts.util.ChartUtils;
 import lecho.lib.hellocharts.view.ColumnChartView;
 
-public class PLZActivity extends BaseActivity implements RestCallback, OAuthTwitterCall.OAuthTwitterCallback, OAuthYelpCall.OAuthYelpCallback, DataHandler.DataReceiver, GoogleLocationProvider.LocationListener {
+public class PLZActivity extends BaseActivity implements RestCallback, OAuthTwitterCall.OAuthTwitterCallback, OAuthYelpCall.OAuthYelpCallback, DataHandler.DataReceiver {
 
-    final String TAG = "PLZActivity";
+    final String TAG = PLZActivity.class.getSimpleName();
 
     final String GOOGLE_LATLONG_CALLID = "googleLatLongCall";
     final String TWITTER_CALLID = "twitterCall";
@@ -211,8 +199,6 @@ public class PLZActivity extends BaseActivity implements RestCallback, OAuthTwit
     HideShowListener hideShowListener;
 
     // LOCATION
-    private GoogleLocationProvider locationProvider;
-    private String zipCodeOfUser;
     private boolean isZipCodeOfUser = false;
 
     private String zip = "";
@@ -271,14 +257,6 @@ public class PLZActivity extends BaseActivity implements RestCallback, OAuthTwit
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        configureSearchView(menu);
-
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
 
@@ -290,8 +268,8 @@ public class PLZActivity extends BaseActivity implements RestCallback, OAuthTwit
                 return true;
 
             case R.id.location_item:
-                if (zipCodeOfUser != zip) {
-                    Log.d(TAG, "SAme same: " + zipCodeOfUser + ", " + zip);
+                if (!zip.equals(zipCodeOfUser)) {
+
                     startLocationClickIntent(zipCodeOfUser);
 
                 }
@@ -551,6 +529,10 @@ public class PLZActivity extends BaseActivity implements RestCallback, OAuthTwit
         Marker startMarker = new Marker(miniMapView);
         startMarker.setPosition(startPoint);
         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+
+        Drawable mapIcon = ContextCompat.getDrawable(this,R.drawable.map_marker);
+        startMarker.setIcon(mapIcon);
+
         miniMapView.getOverlays().add(startMarker);
         miniMapView.invalidate();
     }
@@ -677,15 +659,23 @@ public class PLZActivity extends BaseActivity implements RestCallback, OAuthTwit
         for (int i = 0; i < data.size(); i++) {
             TextView textView = new TextView(this);
             String zipcode = data.get(i).getName();
+            String zipName = DataHandler.fetchZipName(this, zipcode);
 
-            int margin = (int) getResources().getDimension(R.dimen.subitem_margin);
+            int padding = (int) getResources().getDimension(R.dimen.subitem_padding);
+            int margin = (int) getResources().getDimension(R.dimen.subitem_margin_small);
 
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             params.setMargins(margin, margin, margin, margin);
             textView.setLayoutParams(params);
+            textView.setPadding(padding, padding, padding, padding);
+
+            textView.setTextSize(15);
+            textView.setTextColor(Color.WHITE);
+            textView.setBackgroundResource(R.color.graph_transdarkblue);
 
             // Set zip and chartType as tags to access them in OnClickListener
             textView.setTag(R.string.plz_tag, zipcode);
+            textView.setTag(R.string.plz_name_tag, zipName);
             textView.setTag(R.string.charttype_tag, chartType);
 
             textView.setOnClickListener(new View.OnClickListener() {
@@ -694,12 +684,13 @@ public class PLZActivity extends BaseActivity implements RestCallback, OAuthTwit
                     Intent intent = new Intent(getApplicationContext(), PLZActivity.class);
                     intent.setAction(Constants.ZIP_INTENT);
                     intent.putExtra(Constants.ZIP_EXTRA, (String) v.getTag(R.string.plz_tag));
+                    intent.putExtra(Constants.ZIP_NAME_EXTRA, (String) v.getTag(R.string.plz_name_tag));
                     intent.putExtra(Constants.PREOPEN_EXTRA, (String) v.getTag(R.string.charttype_tag));
                     startActivity(intent);
                 }
             });
 
-            textView.setText(zipcode + " " + DataHandler.fetchZipName(this, zip));
+            textView.setText(zipcode + " " + zipName);
             layout.addView(textView);
         }
     }
@@ -709,11 +700,12 @@ public class PLZActivity extends BaseActivity implements RestCallback, OAuthTwit
         TextView textView = new TextView(this);
 
         int padding = (int) getResources().getDimension(R.dimen.subitem_padding);
-        int margin = (int) getResources().getDimension(R.dimen.subitem_margin);
+        int margin = (int) getResources().getDimension(R.dimen.subitem_margin_large);
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT);
         params.setMargins(margin, margin, margin, margin);
         textView.setLayoutParams(params);
+        textView.setPadding(padding, padding, padding, padding);
 
         textView.setTextSize(15);
         textView.setTextColor(Color.WHITE);
@@ -723,7 +715,6 @@ public class PLZActivity extends BaseActivity implements RestCallback, OAuthTwit
         int color = typedValue.data;
         textView.setBackgroundColor(color);
 
-        textView.setPadding(padding, padding, padding, padding);
         textView.setText(text);
 
         if (onclick) {
@@ -866,23 +857,17 @@ public class PLZActivity extends BaseActivity implements RestCallback, OAuthTwit
 
     @Override
     public void onLocationUpdate(Location loc) {
-        zipCodeOfUser = GeoProvider.plzFromLatLng(this, loc.getLatitude(), loc.getLongitude());
-        Log.d(TAG, "New Location: " + zipCodeOfUser);
+        super.onLocationUpdate(loc);
 
-        if (zipCodeOfUser != null) {
+        if (zipCodeOfUser.equals(zip)) {
 
-            locationProvider.stopLocationUpdates();
+            isZipCodeOfUser = true;
+            rateThisBar.setVisibility(View.VISIBLE);
 
-            if (zipCodeOfUser.equals(zip)) {
+        } else {
 
-                isZipCodeOfUser = true;
-                rateThisBar.setVisibility(View.VISIBLE);
+            rateThisBar.setVisibility(View.GONE);
 
-            } else {
-
-                rateThisBar.setVisibility(View.GONE);
-
-            }
         }
     }
 
